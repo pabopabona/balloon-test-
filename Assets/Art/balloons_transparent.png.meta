@@ -1,0 +1,494 @@
+fileFormatVersion: 2
+guid: 91ef4162f87c89347b4c1b7d4b25af93
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8168030917914057187
+    second: balloons_transparent_0
+  - first:
+      213: 1105022323229140978
+    second: balloons_transparent_1
+  - first:
+      213: 846840064380682077
+    second: balloons_transparent_2
+  - first:
+      213: 7803921204571107857
+    second: balloons_transparent_3
+  - first:
+      213: 8283810527293456571
+    second: balloons_transparent_4
+  - first:
+      213: -7273471537184293426
+    second: balloons_transparent_5
+  - first:
+      213: -98998826056347849
+    second: balloons_transparent_6
+  - first:
+      213: 3964081252117180994
+    second: balloons_transparent_7
+  - first:
+      213: 8957283353454636840
+    second: balloons_transparent_8
+  - first:
+      213: -5991824403848345347
+    second: balloons_transparent_9
+  - first:
+      213: 1216207718732954538
+    second: balloons_transparent_10
+  - first:
+      213: -878162296748510127
+    second: balloons_transparent_11
+  - first:
+      213: 7572218023283381857
+    second: balloons_transparent_12
+  - first:
+      213: -6871444062443345112
+    second: balloons_transparent_13
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: balloons_transparent_0
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 1726
+        width: 360
+        height: 410
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e9dca008dcaa5170800000000000000
+      internalID: 8168030917914057187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_1
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 1728
+        width: 360
+        height: 409
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f723f4c2f3d55f00800000000000000
+      internalID: 1105022323229140978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_2
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 1726
+        width: 359
+        height: 409
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5fbaf24d8490cb00800000000000000
+      internalID: 846840064380682077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_3
+      rect:
+        serializedVersion: 2
+        x: 1316
+        y: 1728
+        width: 360
+        height: 409
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11279951df81d4c60800000000000000
+      internalID: 7803921204571107857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_4
+      rect:
+        serializedVersion: 2
+        x: 1725
+        y: 1726
+        width: 360
+        height: 410
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb0c7f9f8c106f270800000000000000
+      internalID: 8283810527293456571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_5
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 1353
+        width: 72
+        height: 241
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecd37366c207f0b90800000000000000
+      internalID: -7273471537184293426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_6
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 1360
+        width: 72
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f0bbb971940aef0800000000000000
+      internalID: -98998826056347849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_7
+      rect:
+        serializedVersion: 2
+        x: 1047
+        y: 1351
+        width: 72
+        height: 242
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 242fa3d65ee330730800000000000000
+      internalID: 3964081252117180994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_8
+      rect:
+        serializedVersion: 2
+        x: 1461
+        y: 1350
+        width: 72
+        height: 244
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82fee2390c9ae4c70800000000000000
+      internalID: 8957283353454636840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_9
+      rect:
+        serializedVersion: 2
+        x: 1870
+        y: 1350
+        width: 73
+        height: 243
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df84a146373c8dca0800000000000000
+      internalID: -5991824403848345347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_10
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 93
+        width: 1059
+        height: 897
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aab7a28f976d0e010800000000000000
+      internalID: 1216207718732954538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_11
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 744
+        width: 925
+        height: 502
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 154f9273b0420d3f0800000000000000
+      internalID: -878162296748510127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_12
+      rect:
+        serializedVersion: 2
+        x: 2126
+        y: 874
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 166dd9f3c2ce51960800000000000000
+      internalID: 7572218023283381857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_13
+      rect:
+        serializedVersion: 2
+        x: 1413
+        y: 71
+        width: 499
+        height: 501
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82be81c180ab3a0a0800000000000000
+      internalID: -6871444062443345112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      balloons_transparent_0: 8168030917914057187
+      balloons_transparent_1: 1105022323229140978
+      balloons_transparent_10: 1216207718732954538
+      balloons_transparent_11: -878162296748510127
+      balloons_transparent_12: 7572218023283381857
+      balloons_transparent_13: -6871444062443345112
+      balloons_transparent_2: 846840064380682077
+      balloons_transparent_3: 7803921204571107857
+      balloons_transparent_4: 8283810527293456571
+      balloons_transparent_5: -7273471537184293426
+      balloons_transparent_6: -98998826056347849
+      balloons_transparent_7: 3964081252117180994
+      balloons_transparent_8: 8957283353454636840
+      balloons_transparent_9: -5991824403848345347
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,650 @@
+fileFormatVersion: 2
+guid: 112474e85cc7efb4b88ec60abc83c593
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2091992821221463546
+    second: Tx_Fire_radial_03_0
+  - first:
+      213: -1839596192626188656
+    second: Tx_Fire_radial_03_1
+  - first:
+      213: 4294621220909823164
+    second: Tx_Fire_radial_03_2
+  - first:
+      213: -8233122412620604190
+    second: Tx_Fire_radial_03_3
+  - first:
+      213: -6412053495848967315
+    second: Tx_Fire_radial_03_4
+  - first:
+      213: -7855327095391807892
+    second: Tx_Fire_radial_03_5
+  - first:
+      213: -6294518853231190991
+    second: Tx_Fire_radial_03_6
+  - first:
+      213: 3062704022348055402
+    second: Tx_Fire_radial_03_7
+  - first:
+      213: 2986961377481653169
+    second: Tx_Fire_radial_03_8
+  - first:
+      213: 7594226539933098904
+    second: Tx_Fire_radial_03_9
+  - first:
+      213: -2057056412708764720
+    second: Tx_Fire_radial_03_10
+  - first:
+      213: 5003779432036313871
+    second: Tx_Fire_radial_03_11
+  - first:
+      213: 412528480353955309
+    second: Tx_Fire_radial_03_12
+  - first:
+      213: -8518964819592474627
+    second: Tx_Fire_radial_03_13
+  - first:
+      213: 6049804132719089706
+    second: Tx_Fire_radial_03_14
+  - first:
+      213: -9017209241484446844
+    second: Tx_Fire_radial_03_15
+  - first:
+      213: -8459512148070840134
+    second: Tx_Fire_radial_03_16
+  - first:
+      213: -8040708043514663422
+    second: Tx_Fire_radial_03_17
+  - first:
+      213: -4832602738316909872
+    second: Tx_Fire_radial_03_18
+  - first:
+      213: 8032099505298491816
+    second: Tx_Fire_radial_03_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_0
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 1160
+        width: 249
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60a6d6aec9fb7f2e0800000000000000
+      internalID: -2091992821221463546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_1
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 1167
+        width: 331
+        height: 221
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09eda5862017876e0800000000000000
+      internalID: -1839596192626188656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_2
+      rect:
+        serializedVersion: 2
+        x: 1057
+        y: 1185
+        width: 390
+        height: 226
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb43f2d1f3f899b30800000000000000
+      internalID: 4294621220909823164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_3
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 1148
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ec117369c21ebd80800000000000000
+      internalID: -8233122412620604190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_4
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 649
+        width: 420
+        height: 276
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d63ee1b615fc307a0800000000000000
+      internalID: -6412053495848967315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_5
+      rect:
+        serializedVersion: 2
+        x: 738
+        y: 860
+        width: 140
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c669ba440a54cf290800000000000000
+      internalID: -7855327095391807892
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_6
+      rect:
+        serializedVersion: 2
+        x: 1290
+        y: 884
+        width: 105
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13cd729e37065a8a0800000000000000
+      internalID: -6294518853231190991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_7
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 632
+        width: 425
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a634738d419e08a20800000000000000
+      internalID: 3062704022348055402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_8
+      rect:
+        serializedVersion: 2
+        x: 1080
+        y: 627
+        width: 434
+        height: 221
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bbfa961c81d37920800000000000000
+      internalID: 2986961377481653169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_9
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 395
+        width: 54
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8936e885dcc146960800000000000000
+      internalID: 7594226539933098904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_10
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 207
+        width: 104
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d30e85671ed373e0800000000000000
+      internalID: -2057056412708764720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_11
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 116
+        width: 296
+        height: 197
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0b2eecd1eef07540800000000000000
+      internalID: 5003779432036313871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_12
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 214
+        width: 125
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dedaa3b977899b500800000000000000
+      internalID: 412528480353955309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_13
+      rect:
+        serializedVersion: 2
+        x: 985
+        y: 218
+        width: 26
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dff042ac1ae86c980800000000000000
+      internalID: -8518964819592474627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_14
+      rect:
+        serializedVersion: 2
+        x: 1076
+        y: 246
+        width: 17
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2859633ec835f350800000000000000
+      internalID: 6049804132719089706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_15
+      rect:
+        serializedVersion: 2
+        x: 1127
+        y: 221
+        width: 88
+        height: 97
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48333f758ff6cd280800000000000000
+      internalID: -9017209241484446844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_16
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 209
+        width: 46
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8c2219586c99a80800000000000000
+      internalID: -8459512148070840134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_17
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 113
+        width: 273
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20eaeabc2aaa96090800000000000000
+      internalID: -8040708043514663422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_18
+      rect:
+        serializedVersion: 2
+        x: 1201
+        y: 120
+        width: 131
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d26a0ae9652fecb0800000000000000
+      internalID: -4832602738316909872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tx_Fire_radial_03_19
+      rect:
+        serializedVersion: 2
+        x: 1397
+        y: 113
+        width: 86
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a948e5b1ffb77f60800000000000000
+      internalID: 8032099505298491816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tx_Fire_radial_03_0: -2091992821221463546
+      Tx_Fire_radial_03_1: -1839596192626188656
+      Tx_Fire_radial_03_10: -2057056412708764720
+      Tx_Fire_radial_03_11: 5003779432036313871
+      Tx_Fire_radial_03_12: 412528480353955309
+      Tx_Fire_radial_03_13: -8518964819592474627
+      Tx_Fire_radial_03_14: 6049804132719089706
+      Tx_Fire_radial_03_15: -9017209241484446844
+      Tx_Fire_radial_03_16: -8459512148070840134
+      Tx_Fire_radial_03_17: -8040708043514663422
+      Tx_Fire_radial_03_18: -4832602738316909872
+      Tx_Fire_radial_03_19: 8032099505298491816
+      Tx_Fire_radial_03_2: 4294621220909823164
+      Tx_Fire_radial_03_3: -8233122412620604190
+      Tx_Fire_radial_03_4: -6412053495848967315
+      Tx_Fire_radial_03_5: -7855327095391807892
+      Tx_Fire_radial_03_6: -6294518853231190991
+      Tx_Fire_radial_03_7: 3062704022348055402
+      Tx_Fire_radial_03_8: 2986961377481653169
+      Tx_Fire_radial_03_9: 7594226539933098904
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

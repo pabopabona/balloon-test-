@@ -1,0 +1,494 @@
+fileFormatVersion: 2
+guid: 5807373f6a2dee140ab09dbd58abcd1d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8932013057237157469
+    second: balloons_transparent2_0
+  - first:
+      213: 4103172159145522179
+    second: balloons_transparent2_1
+  - first:
+      213: 503682478966701769
+    second: balloons_transparent2_2
+  - first:
+      213: -6111766266558719060
+    second: balloons_transparent2_3
+  - first:
+      213: 1149920553560455384
+    second: balloons_transparent2_4
+  - first:
+      213: 94633177556718548
+    second: balloons_transparent2_5
+  - first:
+      213: -2651221056498249564
+    second: balloons_transparent2_6
+  - first:
+      213: -6585325605173581435
+    second: balloons_transparent2_7
+  - first:
+      213: -5396178686789602092
+    second: balloons_transparent2_8
+  - first:
+      213: 1426809568907673612
+    second: balloons_transparent2_9
+  - first:
+      213: 4889915977219613654
+    second: balloons_transparent2_10
+  - first:
+      213: -5418053445362873989
+    second: balloons_transparent2_11
+  - first:
+      213: -3523843711448414668
+    second: balloons_transparent2_12
+  - first:
+      213: -322122811195737172
+    second: balloons_transparent2_13
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: balloon_Red
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 1726
+        width: 360
+        height: 410
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5685cd3d82e4fb70800000000000000
+      internalID: 8932013057237157469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Blue
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 1728
+        width: 360
+        height: 409
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3043426d65561f830800000000000000
+      internalID: 4103172159145522179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Violet
+      rect:
+        serializedVersion: 2
+        x: 908
+        y: 1726
+        width: 359
+        height: 409
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cef566cb807df600800000000000000
+      internalID: 503682478966701769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Green
+      rect:
+        serializedVersion: 2
+        x: 1316
+        y: 1728
+        width: 360
+        height: 409
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cab5d8b46f4ae2ba0800000000000000
+      internalID: -6111766266558719060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Yellow
+      rect:
+        serializedVersion: 2
+        x: 1725
+        y: 1726
+        width: 360
+        height: 410
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d834e2a6a655ff00800000000000000
+      internalID: 1149920553560455384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonString_Red
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 1353
+        width: 72
+        height: 241
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d31c34af54305100800000000000000
+      internalID: 94633177556718548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonString_Blue
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 1360
+        width: 72
+        height: 233
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a0d262fe78f43bd0800000000000000
+      internalID: -2651221056498249564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonString_Violet
+      rect:
+        serializedVersion: 2
+        x: 1047
+        y: 1351
+        width: 72
+        height: 242
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 589285da0493c94a0800000000000000
+      internalID: -6585325605173581435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonString_Green
+      rect:
+        serializedVersion: 2
+        x: 1461
+        y: 1350
+        width: 72
+        height: 244
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d43f55131cec15b0800000000000000
+      internalID: -5396178686789602092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonString_Yellow
+      rect:
+        serializedVersion: 2
+        x: 1870
+        y: 1350
+        width: 73
+        height: 243
+      alignment: 9
+      pivot: {x: 0.5, y: 0.95}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c00cedc4ebb0dc310800000000000000
+      internalID: 1426809568907673612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Launcher
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 93
+        width: 1059
+        height: 1040
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d3aea36ca87cd340800000000000000
+      internalID: 4889915977219613654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Combo
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 744
+        width: 925
+        height: 502
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b798017f8153fc4b0800000000000000
+      internalID: -5418053445362873989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent2_12
+      rect:
+        serializedVersion: 2
+        x: 2126
+        y: 874
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4368f1780dac81fc0800000000000000
+      internalID: -3523843711448414668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_Wheel
+      rect:
+        serializedVersion: 2
+        x: 1413
+        y: 71
+        width: 499
+        height: 501
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cabb0a88207978bf0800000000000000
+      internalID: -322122811195737172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: adac8fb640df47343af17931f2d5dcd6
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      balloonString_Blue: -2651221056498249564
+      balloonString_Green: -5396178686789602092
+      balloonString_Red: 94633177556718548
+      balloonString_Violet: -6585325605173581435
+      balloonString_Yellow: 1426809568907673612
+      balloon_Blue: 4103172159145522179
+      balloon_Combo: -5418053445362873989
+      balloon_Green: -6111766266558719060
+      balloon_Launcher: 4889915977219613654
+      balloon_Red: 8932013057237157469
+      balloon_Violet: 503682478966701769
+      balloon_Wheel: -322122811195737172
+      balloon_Yellow: 1149920553560455384
+      balloons_transparent2_12: -3523843711448414668
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
