@@ -4,57 +4,49 @@ using UnityEngine;
 /// <summary>
 /// 풍선 하나(발사되어 날아가는 풍선 / 그리드에 붙은 풍선 공통)를 다루는 스크립트.
 /// 발사된 풍선은 위로 이동하다가, 화면 천장 또는 이미 붙어있는 다른 풍선에 닿으면
-/// HexGridManager를 통해 가장 가까운 빈 격자 칸에 스냅되어 붙습니다.
+/// HexGridManager를 통해 격자 칸에 스냅되어 붙습니다.
 /// </summary>
 [RequireComponent(typeof(SpriteRenderer))]
 public class Balloon : MonoBehaviour
 {
     public enum BalloonState
     {
-        Moving,     // 발사되어 날아가는 중
-        Attached,   // 그리드에 붙어서 정지한 상태
-        Popped      // 터짐 처리됨 (곧 제거될 예정)
+        Moving,
+        Attached,
+        Popped
     }
 
     [Header("상태")]
     public BalloonColor color;
     public BalloonState state = BalloonState.Moving;
-
-    [Tooltip("그리드에 붙은 이후 자신의 격자 좌표 (row, col)")]
     public Vector2Int gridCell;
 
     [Header("이동 설정 (Moving 상태일 때만 사용)")]
     public Vector2 velocity;
 
     [Header("실제 이미지 리소스 (선택 사항)")]
-    [Tooltip("색깔별 몸통 스프라이트. 배열 순서는 BalloonColor enum 순서(Red, Blue, Green, Yellow, Purple)와 정확히 일치해야 합니다. " +
-             "비워두면 기존처럼 단색 틴트로 표시됩니다.")]
     public Sprite[] bodySpritesByColor;
-
-    [Tooltip("색깔별 끈 스프라이트. 순서는 bodySpritesByColor와 동일합니다. 비워두면 끈 없이 표시됩니다.")]
     public Sprite[] stringSpritesByColor;
-
-    [Tooltip("끈을 표시할 자식 오브젝트의 SpriteRenderer. 비워두면 끈 표시를 생략합니다.")]
     public SpriteRenderer stringRenderer;
 
     [Header("충돌 판정 설정")]
     [Tooltip("이 반경 안에 다른 풍선이 있으면 충돌한 것으로 간주 (보통 풍선 지름과 비슷하게)")]
     public float collisionRadius = 1.1f;
 
-    [Tooltip("HexGridManager가 씬에 없을 때 대신 사용할 예비 천장 y좌표. " +
-             "HexGridManager가 있으면 그쪽의 topRowY를 우선 사용해서 격자 스냅 위치와 완전히 일치시킵니다.")]
+    [Tooltip("HexGridManager가 씬에 없을 때 대신 사용할 예비 천장 y좌표.")]
     public float ceilingY = 8.4f;
 
     private SpriteRenderer spriteRenderer;
+
+    // 이번 이동 중 실제로 충돌한 "특정 풍선". 격자 칸을 정확히 알고 있는 이 풍선을 기준으로
+    // 이웃 칸을 계산하면, 위치 좌표를 반올림해서 칸을 추정하는 방식보다 훨씬 정확합니다.
+    private Balloon collidedWithBalloon;
 
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    /// <summary>
-    /// 스폰 시점에 색깔과 속도를 세팅합니다.
-    /// </summary>
     public void Initialize(BalloonColor balloonColor, Vector2 initialVelocity)
     {
         color = balloonColor;
@@ -75,13 +67,11 @@ public class Balloon : MonoBehaviour
 
         if (bodySprite != null)
         {
-            // 실제 이미지가 있으면 그걸 사용하고, 틴트는 흰색(원본 색 그대로)으로 초기화
             spriteRenderer.sprite = bodySprite;
             spriteRenderer.color = Color.white;
         }
         else
         {
-            // 이미지가 없는 색은 기존처럼 단색 원(기본 스프라이트) + 틴트로 대체
             spriteRenderer.color = BalloonColorUtil.ToColor(color);
         }
 
@@ -104,52 +94,88 @@ public class Balloon : MonoBehaviour
         }
     }
 
+    [Header("저사양 기기 대응 - 이동 세분화")]
+    [Tooltip("프레임이 버벅여서 한 프레임에 이 거리(월드 유닛) 이상 이동해야 하면, " +
+             "여러 단계로 쪼개서 이동시키며 매 단계마다 충돌 검사를 합니다. " +
+             "이렇게 안 하면 저사양 기기에서 프레임 저하가 생겼을 때, 풍선이 한 번에 너무 멀리 " +
+             "이동해버려서 옆에 있는 풍선을 그대로 통과(터널링)해버릴 수 있습니다.")]
+    public float maxStepDistance = 0.1f;
+
+    [Tooltip("한 프레임에 쪼갤 수 있는 최대 단계 수 (극단적인 렉 상황에서 성능이 더 나빠지는 것을 막는 안전장치)")]
+    public int maxStepsPerFrame = 60;
+
     void Update()
     {
         if (state != BalloonState.Moving) return;
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver) return;
+        if (HexGridManager.Instance != null && !HexGridManager.Instance.IsReady) return;
 
-        transform.position += (Vector3)(velocity * Time.deltaTime);
+        float distanceThisFrame = velocity.magnitude * Time.deltaTime;
+        int steps = Mathf.Clamp(Mathf.CeilToInt(distanceThisFrame / maxStepDistance), 1, maxStepsPerFrame);
+        Vector2 stepMovement = velocity * (Time.deltaTime / steps);
 
-        if (CheckCollision())
+        for (int i = 0; i < steps; i++)
         {
-            AttachToGrid();
+            transform.position += (Vector3)stepMovement;
+
+            if (CheckCollision())
+            {
+                AttachToGrid();
+                return; // 이미 붙었으니 이번 프레임의 남은 단계는 진행할 필요 없음
+            }
         }
     }
 
     /// <summary>
     /// 천장에 닿았는지, 혹은 이미 붙어있는 다른 풍선과 가까워졌는지 검사합니다.
-    /// 천장 기준선은 HexGridManager의 topRowY를 우선 사용해서, 실제 스냅되는 격자 위치와
-    /// 충돌이 감지되는 위치가 정확히 일치하도록 합니다. (그래야 "닿았다가 뚝 떨어지는" 현상이 없음)
+    /// 다른 풍선과 충돌했다면 그 풍선을 collidedWithBalloon에 기억해둡니다(정확한 배치를 위해).
     /// </summary>
     private bool CheckCollision()
     {
+        collidedWithBalloon = null;
+
+        // 격자 셀 크기 계산이 아직 안정화되기 전이면(앱 시작 직후 몇 프레임), 잘못된 계산값으로
+        // 충돌/배치가 이루어지지 않도록 잠시 대기합니다. 실제로는 첫 발사까지 시간이 걸리기 때문에
+        // 거의 항상 이미 준비된 상태겠지만, 혹시 모를 극단적인 상황을 대비한 안전장치입니다.
+        if (HexGridManager.Instance != null && !HexGridManager.Instance.IsReady)
+        {
+            return false;
+        }
+
         float effectiveCeiling = HexGridManager.Instance != null
             ? HexGridManager.Instance.topRowY
             : ceilingY;
 
-        if (transform.position.y >= effectiveCeiling)
-            return true;
-
-        // 씬에 존재하는 Attached 상태 풍선들과의 거리 체크
-        // (풍선 개수가 매우 많아지면 성능 최적화가 필요하지만, 지금 단계에서는 단순 방식으로 충분)
+        // 다른 풍선과의 충돌을 먼저 검사 (충돌한 특정 풍선을 알아야 정확한 배치가 가능하므로)
         Balloon[] allBalloons = FindObjectsByType<Balloon>(FindObjectsSortMode.None);
+        Balloon closest = null;
+        float closestDist = float.MaxValue;
+
         foreach (Balloon other in allBalloons)
         {
             if (other == this) continue;
             if (other.state != BalloonState.Attached) continue;
 
             float dist = Vector3.Distance(transform.position, other.transform.position);
-            if (dist <= collisionRadius)
-                return true;
+            if (dist <= collisionRadius && dist < closestDist)
+            {
+                closestDist = dist;
+                closest = other;
+            }
         }
+
+        if (closest != null)
+        {
+            collidedWithBalloon = closest;
+            return true;
+        }
+
+        if (transform.position.y >= effectiveCeiling)
+            return true;
 
         return false;
     }
 
-    /// <summary>
-    /// 그리드 매니저에게 위임하여 가장 가까운 빈 칸에 스냅 배치시킵니다.
-    /// </summary>
     private void AttachToGrid()
     {
         if (HexGridManager.Instance == null)
@@ -159,33 +185,33 @@ public class Balloon : MonoBehaviour
             return;
         }
 
-        Vector2Int targetCell = HexGridManager.Instance.FindNearestEmptyCell(transform.position);
+        Vector2Int targetCell;
+
+        if (collidedWithBalloon != null)
+        {
+            // 충돌한 풍선의 "정확한" 격자 좌표를 알고 있으므로, 그 이웃 칸 중 비어있고
+            // 지금 내 위치와 가장 가까운 칸을 선택합니다. 위치를 반올림해서 칸을 추정하는 것보다
+            // 훨씬 정확해서, 인접 판정이 어긋나는 문제를 방지합니다.
+            targetCell = HexGridManager.Instance.FindNearestEmptyNeighborOf(collidedWithBalloon.gridCell, transform.position);
+        }
+        else
+        {
+            // 천장에만 닿은 경우: 기존처럼 위치 기반으로 가장 가까운 빈 칸을 찾음
+            targetCell = HexGridManager.Instance.FindNearestEmptyCell(transform.position);
+        }
+
         HexGridManager.Instance.PlaceBalloon(this, targetCell);
     }
 
-    /// <summary>
-    /// 이 풍선이 그리드에 붙는(Attached) 순간 호출되는 이벤트.
-    /// BalloonSpawner가 구독해서 "다음 발사 가능" 신호로 사용합니다.
-    /// </summary>
-    public System.Action<Balloon> OnAttached;
-
-    /// <summary>
-    /// 이동을 멈추고 그리드에 붙은 것으로 간주합니다. (실제 위치/등록은 HexGridManager.PlaceBalloon에서 처리)
-    /// </summary>
     public void Stop()
     {
         velocity = Vector2.zero;
         state = BalloonState.Attached;
-        OnAttached?.Invoke(this);
     }
 
     private Coroutine slideCoroutine;
     private Coroutine bumpCoroutine;
 
-    /// <summary>
-    /// 이 풍선을 지정된 월드 좌표로 부드럽게 슬라이드 이동시킵니다.
-    /// (터진 풍선의 반동으로 실제로 한 칸 밀려날 때 사용)
-    /// </summary>
     public void StartSlide(Vector3 targetWorldPosition, float duration = 0.15f)
     {
         if (slideCoroutine != null)
@@ -211,10 +237,6 @@ public class Balloon : MonoBehaviour
         slideCoroutine = null;
     }
 
-    /// <summary>
-    /// 밀려나려고 했지만 막혀서 이동하지 못했을 때, 제자리에서 살짝 밀렸다가
-    /// 돌아오는 반동 애니메이션만 재생합니다. 그리드 위치는 바뀌지 않습니다.
-    /// </summary>
     public void PlayRecoilBump(Vector3 direction, float bumpDistance = 0.12f, float duration = 0.12f)
     {
         if (bumpCoroutine != null)

@@ -1,40 +1,54 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using Unity.Services.Leaderboards;
+using Unity.Services.Leaderboards.Models;
 
 /// <summary>
-/// 이름 + 점수 한 건을 나타내는 데이터.
+/// 순위표 한 줄(랭크 + 이름 + 점수)을 나타내는 데이터.
+/// playerId는 "이게 내 항목인지" 판별하는 용도로만 쓰입니다.
 /// </summary>
 [System.Serializable]
 public class ScoreEntry
 {
+    public string playerId;
     public string playerName;
     public int score;
+    public int rank; // 1부터 시작
+    public int level;
 }
 
 /// <summary>
-/// JsonUtility는 최상위가 배열/리스트인 JSON을 바로 다루지 못해서, 감싸는 용도의 래퍼입니다.
+/// UGS에 점수와 함께 저장할 메타데이터(플레이어가 입력한 이름).
 /// </summary>
 [System.Serializable]
-public class ScoreEntryListWrapper
+public class ScoreMetadata
 {
-    public List<ScoreEntry> entries = new List<ScoreEntry>();
+    public string playerName;
+    public int level;
 }
 
 /// <summary>
-/// 점수 순위표를 저장/조회하는 매니저.
-/// 지금은 PlayerPrefs를 이용한 "기기 안에만 저장되는 로컬 순위표"로 구현되어 있습니다.
-/// 나중에 온라인 순위표로 확장할 때는, SubmitScore/LoadEntries 두 메서드의 내부 구현만
-/// 서버 API 호출(코루틴/async)로 교체하면 되도록 설계했습니다. 이 클래스를 사용하는
-/// LeaderboardUI 쪽 코드는 그대로 두어도 됩니다.
+/// 점수 순위표를 UGS(Unity Gaming Services) Leaderboards로 저장/조회하는 매니저.
 /// </summary>
 public class LeaderboardManager : MonoBehaviour
 {
     public static LeaderboardManager Instance { get; private set; }
 
-    private const string PrefsKey = "local_leaderboard_v1";
+    [Tooltip("Unity Dashboard에서 만든 리더보드의 ID")]
+    public string leaderboardId = "balloon_top_scores";
 
-    [Tooltip("순위표에 보관할 최대 인원 수")]
+    [Tooltip("한 번에 조회할 상위 순위 개수")]
     public int maxEntries = 10;
+
+    public bool IsReady { get; private set; } = false;
+
+    /// <summary>
+    /// 현재 로그인된(익명) 플레이어의 고유 ID. 순위표 항목 중 "내 것"을 찾을 때 사용합니다.
+    /// </summary>
+    public string CurrentPlayerId => IsReady ? AuthenticationService.Instance.PlayerId : null;
 
     void Awake()
     {
@@ -46,56 +60,152 @@ public class LeaderboardManager : MonoBehaviour
         Instance = this;
     }
 
-    /// <summary>
-    /// 저장된 전체 순위표를 점수 내림차순으로 불러옵니다.
-    /// </summary>
-    public List<ScoreEntry> LoadEntries()
+    async void Start()
     {
-        string json = PlayerPrefs.GetString(PrefsKey, "");
-        if (string.IsNullOrEmpty(json))
-            return new List<ScoreEntry>();
-
-        ScoreEntryListWrapper wrapper = JsonUtility.FromJson<ScoreEntryListWrapper>(json);
-        return (wrapper != null && wrapper.entries != null) ? wrapper.entries : new List<ScoreEntry>();
+        await InitializeAsync();
     }
 
-    private void SaveEntries(List<ScoreEntry> entries)
+    private async Task InitializeAsync()
     {
-        ScoreEntryListWrapper wrapper = new ScoreEntryListWrapper { entries = entries };
-        string json = JsonUtility.ToJson(wrapper);
-        PlayerPrefs.SetString(PrefsKey, json);
-        PlayerPrefs.Save();
-    }
-
-    /// <summary>
-    /// 새 점수를 등록합니다. 등록 후 점수 내림차순으로 정렬되고, 상위 maxEntries개만 유지됩니다.
-    /// </summary>
-    public void SubmitScore(string playerName, int score)
-    {
-        List<ScoreEntry> entries = LoadEntries();
-
-        entries.Add(new ScoreEntry
+        try
         {
-            playerName = string.IsNullOrEmpty(playerName) ? "Player" : playerName,
-            score = score
-        });
+            await UnityServices.InitializeAsync();
 
-        entries.Sort((a, b) => b.score.CompareTo(a.score));
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
 
-        if (entries.Count > maxEntries)
-            entries.RemoveRange(maxEntries, entries.Count - maxEntries);
+            IsReady = true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[LeaderboardManager] UGS 초기화 실패: {e}");
+            IsReady = false;
+        }
+    }
 
-        SaveEntries(entries);
+    public async Task SubmitScoreAsync(string playerName, int score, int level)
+    {
+        if (!IsReady)
+        {
+            Debug.LogWarning("[LeaderboardManager] 아직 준비되지 않아 점수 제출을 건너뜁니다.");
+            return;
+        }
+
+        try
+        {
+            var metadata = new ScoreMetadata
+            {
+                playerName = string.IsNullOrEmpty(playerName) ? "Player" : playerName,
+                level = level
+            };
+
+            var options = new AddPlayerScoreOptions { Metadata = metadata };
+            await LeaderboardsService.Instance.AddPlayerScoreAsync(leaderboardId, score, options);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[LeaderboardManager] 점수 제출 실패: {e}");
+        }
     }
 
     /// <summary>
-    /// 이 점수가 현재 순위표에 들어갈 수 있는지(순위표가 다 안 찼거나, 꼴찌보다 높은지) 확인합니다.
-    /// UI에서 "순위표에 오를 수 있어요!" 같은 연출을 넣고 싶을 때 사용하면 됩니다.
+    /// 상위 순위표를 서버에서 조회합니다. 각 항목에는 playerId와 실제 rank가 포함됩니다.
     /// </summary>
-    public bool IsHighScore(int score)
+    public async Task<List<ScoreEntry>> LoadEntriesAsync()
     {
-        List<ScoreEntry> entries = LoadEntries();
-        if (entries.Count < maxEntries) return true;
-        return score > entries[entries.Count - 1].score;
+        List<ScoreEntry> result = new List<ScoreEntry>();
+
+        if (!IsReady)
+        {
+            Debug.LogWarning("[LeaderboardManager] 아직 준비되지 않아 조회를 건너뜁니다.");
+            return result;
+        }
+
+        try
+        {
+            var options = new GetScoresOptions { IncludeMetadata = true, Limit = maxEntries };
+            LeaderboardScoresPage page = await LeaderboardsService.Instance.GetScoresAsync(leaderboardId, options);
+
+            foreach (LeaderboardEntry entry in page.Results)
+            {
+                result.Add(ToScoreEntry(entry));
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[LeaderboardManager] 순위표 조회 실패: {e}");
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 현재 플레이어 본인의 순위/점수만 별도로 조회합니다.
+    /// 아직 한 번도 점수를 제출하지 않았거나 조회 실패 시 null을 반환합니다.
+    /// </summary>
+    public async Task<ScoreEntry> GetMyEntryAsync()
+    {
+        if (!IsReady)
+        {
+            Debug.LogWarning("[LeaderboardManager] 아직 준비되지 않아 조회를 건너뜁니다.");
+            return null;
+        }
+
+        try
+        {
+            var options = new GetPlayerScoreOptions { IncludeMetadata = true };
+            LeaderboardEntry entry = await LeaderboardsService.Instance.GetPlayerScoreAsync(leaderboardId, options);
+
+            if (entry == null) return null;
+
+            return ToScoreEntry(entry);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[LeaderboardManager] 내 순위 조회 실패(아직 기록이 없을 수 있음): {e.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// LeaderboardEntry(서버 응답)를 우리 UI가 다루기 쉬운 ScoreEntry로 변환합니다.
+    /// Metadata는 Dictionary가 아니라 JSON 문자열로 오기 때문에 직접 역직렬화합니다.
+    /// </summary>
+    private ScoreEntry ToScoreEntry(LeaderboardEntry entry)
+    {
+        string name = "Player";
+        int level = 0;
+
+        if (!string.IsNullOrEmpty(entry.Metadata))
+        {
+            try
+            {
+                ScoreMetadata meta = JsonUtility.FromJson<ScoreMetadata>(entry.Metadata);
+                if (meta != null)
+                {
+                    if (!string.IsNullOrEmpty(meta.playerName))
+                    {
+                        name = meta.playerName;
+                    }
+                    level = meta.level;
+                }
+            }
+            catch (System.Exception parseEx)
+            {
+                Debug.LogWarning($"[LeaderboardManager] 메타데이터 파싱 실패: {parseEx.Message}");
+            }
+        }
+
+        return new ScoreEntry
+        {
+            playerId = entry.PlayerId,
+            playerName = name,
+            score = (int)entry.Score,
+            // UGS의 Rank는 0부터 시작(0-indexed)하므로, 화면에는 1등부터 보이도록 +1 해줍니다.
+            rank = entry.Rank + 1,
+            level = level
+        };
     }
 }

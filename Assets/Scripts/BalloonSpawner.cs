@@ -3,6 +3,11 @@ using UnityEngine;
 /// <summary>
 /// LauncherController의 발사 이벤트를 받아서 실제 풍선(Balloon) 오브젝트를 생성하고 쏘는 역할.
 /// 발사대(Launcher) 오브젝트에 같이 붙여서 사용합니다.
+///
+/// 중요: 다음 발사는 "풍선이 그리드에 붙는 순간"이 아니라, "이번 발사로 시작된 매칭/연쇄
+/// 반응이 완전히 다 끝나는 순간"(HexGridManager.OnPlacementSettled)에만 허용합니다.
+/// 연쇄가 끝나기 전에 다음 풍선이 끼어들면, 격자 데이터가 동시에 바뀌면서 풍선이 겹치거나
+/// 밀려났다가 되돌아오거나 매칭이 어긋나는 등의 문제가 생기기 때문입니다.
 /// </summary>
 [RequireComponent(typeof(LauncherController))]
 public class BalloonSpawner : MonoBehaviour
@@ -14,19 +19,11 @@ public class BalloonSpawner : MonoBehaviour
     [Header("현재 발사 대기 중인 풍선 색")]
     public BalloonColor currentColor;
 
-    [Tooltip("현재 색을 화면에 미리 보여줄 SpriteRenderer (발사대 위 대기 풍선 등). 없어도 동작에는 문제없음")]
-    public SpriteRenderer currentColorPreview;
-
     [Header("미리보기 이미지 (선택 사항)")]
-    [Tooltip("색깔별 미리보기용 스프라이트. 순서는 BalloonColor enum 순서(Red, Blue, Green, Yellow, Purple)와 " +
-             "정확히 일치해야 합니다. Balloon 프리팹의 Body Sprites By Color와 같은 이미지를 넣으면 됩니다. " +
-             "비워두면 기존처럼 단색 틴트로 표시됩니다.")]
+    public SpriteRenderer currentColorPreview;
     public Sprite[] previewSpritesByColor;
 
     private LauncherController launcher;
-
-    // 현재 날아가고 있는 풍선. 이 풍선이 그리드에 붙기(Attached) 전까지는 새로 발사되지 않도록 막는 용도.
-    private Balloon activeBalloon;
 
     void Awake()
     {
@@ -45,11 +42,11 @@ public class BalloonSpawner : MonoBehaviour
     {
         if (launcher != null)
             launcher.OnShoot -= HandleShoot;
+
+        if (HexGridManager.Instance != null)
+            HexGridManager.Instance.OnPlacementSettled -= HandlePlacementSettled;
     }
 
-    /// <summary>
-    /// 발사 이벤트 수신 시 실제 Balloon 인스턴스를 생성하고 속도를 부여합니다.
-    /// </summary>
     private void HandleShoot(Vector3 spawnPosition, Vector2 velocity)
     {
         if (balloonPrefab == null)
@@ -58,46 +55,43 @@ public class BalloonSpawner : MonoBehaviour
             return;
         }
 
-        // 이전에 발사한 풍선이 아직 날아가는 중이면(그리드에 붙지 않았으면) 새 발사를 무시
-        // (LauncherController.CanShoot이 false일 때는 애초에 이 이벤트 자체가 호출되지 않지만,
-        //  이중 안전장치로 한 번 더 확인합니다.)
-        if (activeBalloon != null && activeBalloon.state == Balloon.BalloonState.Moving)
-        {
-            return;
-        }
-
         Balloon newBalloon = Instantiate(balloonPrefab, spawnPosition, Quaternion.identity);
         newBalloon.Initialize(currentColor, velocity);
-        activeBalloon = newBalloon;
-        activeBalloon.OnAttached += HandleBalloonAttached;
 
-        // 발사한 풍선이 그리드에 붙을 때까지 발사대의 타이머/발사를 정지
+        // 이번 풍선의 배치+매칭+연쇄가 완전히 끝날 때까지 다음 발사를 막음
         launcher.SetShootingBlocked(true);
 
-        // 다음 발사를 위해 새 색을 미리 뽑아둠
+        if (HexGridManager.Instance != null)
+        {
+            HexGridManager.Instance.OnPlacementSettled += HandlePlacementSettled;
+        }
+        else
+        {
+            // 안전장치: 그리드 매니저가 없는 예외적인 상황이면 바로 풀어줌
+            launcher.SetShootingBlocked(false);
+        }
+
         PickNewColor();
     }
 
     /// <summary>
-    /// 발사된 풍선이 그리드에 붙었을 때 호출됩니다. 다음 발사를 다시 허용합니다.
+    /// 이번 발사로 시작된 매칭/연쇄가 완전히 끝났을 때 호출되어 다음 발사를 허용합니다.
     /// </summary>
-    private void HandleBalloonAttached(Balloon balloon)
+    private void HandlePlacementSettled()
     {
-        balloon.OnAttached -= HandleBalloonAttached;
+        if (HexGridManager.Instance != null)
+            HexGridManager.Instance.OnPlacementSettled -= HandlePlacementSettled;
 
-        if (activeBalloon == balloon)
-        {
-            activeBalloon = null;
-            launcher.SetShootingBlocked(false);
-        }
+        launcher.SetShootingBlocked(false);
     }
 
-    /// <summary>
-    /// 다음 발사할 풍선 색을 랜덤으로 뽑고, 미리보기가 있으면 갱신합니다.
-    /// </summary>
     private void PickNewColor()
     {
-        currentColor = BalloonColorUtil.GetRandom();
+        int level = launcher != null ? launcher.currentLevel : 1;
+
+        currentColor = GameManager.Instance != null
+            ? GameManager.Instance.GetRandomColorForLevel(level)
+            : BalloonColorUtil.GetRandom();
 
         if (currentColorPreview == null) return;
 

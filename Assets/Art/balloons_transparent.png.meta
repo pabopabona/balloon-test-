@@ -44,6 +44,18 @@ TextureImporter:
   - first:
       213: -6871444062443345112
     second: balloons_transparent_13
+  - first:
+      213: 4351800975287751691
+    second: balloons_transparent_14
+  - first:
+      213: -171407145272213096
+    second: balloons_transparent_15
+  - first:
+      213: -9177915319047723738
+    second: balloons_transparent_16
+  - first:
+      213: -2000288062934283341
+    second: balloons_transparent_17
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -111,7 +123,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -152,15 +164,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: balloons_transparent_0
+      name: balloon_red
       rect:
         serializedVersion: 2
-        x: 90
-        y: 1726
-        width: 360
-        height: 410
+        x: 21
+        y: 1784
+        width: 290
+        height: 330
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -174,15 +186,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_1
+      name: balloon_blue
       rect:
         serializedVersion: 2
-        x: 499
-        y: 1728
-        width: 360
-        height: 409
+        x: 331
+        y: 1784
+        width: 290
+        height: 330
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -196,15 +208,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_2
+      name: balloon_violet
       rect:
         serializedVersion: 2
-        x: 908
-        y: 1726
-        width: 359
-        height: 409
+        x: 643
+        y: 1783
+        width: 291
+        height: 331
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -218,15 +230,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_3
+      name: balloon_green
       rect:
         serializedVersion: 2
-        x: 1316
-        y: 1728
-        width: 360
-        height: 409
+        x: 953
+        y: 1787
+        width: 291
+        height: 329
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -240,15 +252,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_4
+      name: balloon_yellow
       rect:
         serializedVersion: 2
-        x: 1725
-        y: 1726
-        width: 360
-        height: 410
+        x: 1265
+        y: 1785
+        width: 290
+        height: 331
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -262,15 +274,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_5
+      name: balloon_darkgray
       rect:
         serializedVersion: 2
-        x: 234
-        y: 1353
-        width: 72
-        height: 241
+        x: 1581
+        y: 1785
+        width: 290
+        height: 331
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -284,15 +296,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_6
+      name: balloon_rainbow
       rect:
         serializedVersion: 2
-        x: 645
-        y: 1360
-        width: 72
-        height: 233
+        x: 1895
+        y: 1784
+        width: 290
+        height: 330
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -306,15 +318,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_7
+      name: balloonstring_red
       rect:
         serializedVersion: 2
-        x: 1047
-        y: 1351
-        width: 72
-        height: 242
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 136
+        y: 1521
+        width: 59
+        height: 195
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -328,15 +340,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_8
+      name: balloonstring_blue
       rect:
         serializedVersion: 2
-        x: 1461
-        y: 1350
-        width: 72
-        height: 244
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 448
+        y: 1527
+        width: 59
+        height: 189
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -350,15 +362,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_9
+      name: balloonstring_violet
       rect:
         serializedVersion: 2
-        x: 1870
-        y: 1350
-        width: 73
-        height: 243
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 755
+        y: 1520
+        width: 60
+        height: 196
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -372,15 +384,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_10
+      name: balloonstring_green
       rect:
         serializedVersion: 2
-        x: 73
-        y: 93
-        width: 1059
-        height: 897
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1070
+        y: 1522
+        width: 59
+        height: 196
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -394,15 +406,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_11
+      name: balloonstring_yellow
       rect:
         serializedVersion: 2
-        x: 1200
-        y: 744
-        width: 925
-        height: 502
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1381
+        y: 1522
+        width: 59
+        height: 196
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -416,15 +428,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_12
+      name: balloonstring_darkgray
       rect:
         serializedVersion: 2
-        x: 2126
-        y: 874
-        width: 7
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1700
+        y: 1522
+        width: 59
+        height: 196
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -438,15 +450,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloons_transparent_13
+      name: balloonstring_rainbow
       rect:
         serializedVersion: 2
-        x: 1413
-        y: 71
-        width: 499
-        height: 501
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 2010
+        y: 1521
+        width: 59
+        height: 195
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -459,11 +471,99 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: balloon_combo
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 912
+        width: 925
+        height: 502
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0499312ee3b46c30800000000000000
+      internalID: 4351800975287751691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_transparent_15
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 1042
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 891061a0c1a0f9df0800000000000000
+      internalID: -171407145272213096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_launcher
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 85
+        width: 885
+        height: 750
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6256b8dd4ae71a080800000000000000
+      internalID: -9177915319047723738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloon_wheel
+      rect:
+        serializedVersion: 2
+        x: 1054
+        y: 38
+        width: 438
+        height: 439
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bb0950da9c8d34e0800000000000000
+      internalID: -2000288062934283341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d48fe88751c655f4eac489144a8f9702
     internalID: 0
     vertices: []
     indices: 
@@ -473,20 +573,24 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      balloons_transparent_0: 8168030917914057187
-      balloons_transparent_1: 1105022323229140978
-      balloons_transparent_10: 1216207718732954538
-      balloons_transparent_11: -878162296748510127
-      balloons_transparent_12: 7572218023283381857
-      balloons_transparent_13: -6871444062443345112
-      balloons_transparent_2: 846840064380682077
-      balloons_transparent_3: 7803921204571107857
-      balloons_transparent_4: 8283810527293456571
-      balloons_transparent_5: -7273471537184293426
-      balloons_transparent_6: -98998826056347849
-      balloons_transparent_7: 3964081252117180994
-      balloons_transparent_8: 8957283353454636840
-      balloons_transparent_9: -5991824403848345347
+      balloon_blue: 1105022323229140978
+      balloon_combo: 4351800975287751691
+      balloon_darkgray: -7273471537184293426
+      balloon_green: 7803921204571107857
+      balloon_launcher: -9177915319047723738
+      balloon_rainbow: -98998826056347849
+      balloon_red: 8168030917914057187
+      balloon_violet: 846840064380682077
+      balloon_wheel: -2000288062934283341
+      balloon_yellow: 8283810527293456571
+      balloons_transparent_15: -171407145272213096
+      balloonstring_blue: 8957283353454636840
+      balloonstring_darkgray: 7572218023283381857
+      balloonstring_green: 1216207718732954538
+      balloonstring_rainbow: -6871444062443345112
+      balloonstring_red: 3964081252117180994
+      balloonstring_violet: -5991824403848345347
+      balloonstring_yellow: -878162296748510127
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

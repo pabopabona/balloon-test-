@@ -184,6 +184,8 @@ public class LauncherController : MonoBehaviour
 
     /// <summary>
     /// 화면 좌표(픽셀)를 월드 좌표로 변환해서 발사대의 x 위치를 갱신합니다.
+    /// followSmoothness는 "1초 동안 목표 지점까지 따라잡는 비율"을 기준으로 계산되어,
+    /// 프레임레이트(에디터 vs 빌드, 기기 성능 차이)에 관계없이 항상 동일한 체감 속도를 유지합니다.
     /// </summary>
     private void MoveToScreenPosition(Vector3 screenPosition)
     {
@@ -195,9 +197,19 @@ public class LauncherController : MonoBehaviour
         float targetX = Mathf.Clamp(worldPos.x, minX, maxX);
 
         Vector3 newPos = transform.position;
-        newPos.x = followSmoothness >= 1f
-            ? targetX
-            : Mathf.Lerp(transform.position.x, targetX, followSmoothness);
+
+        if (followSmoothness >= 1f)
+        {
+            newPos.x = targetX;
+        }
+        else
+        {
+            // followSmoothness를 "초당 감쇠율"로 변환해서, 프레임레이트와 무관하게 동일한 속도로 수렴하게 함
+            float clampedSmoothness = Mathf.Clamp(followSmoothness, 0.0001f, 0.9999f);
+            float decayRate = -Mathf.Log(1f - clampedSmoothness) * 60f; // 기존 수치를 60fps 기준으로 보정
+            float t = 1f - Mathf.Exp(-decayRate * Time.deltaTime);
+            newPos.x = Mathf.Lerp(transform.position.x, targetX, t);
+        }
 
         transform.position = newPos;
     }
