@@ -1611,7 +1611,7 @@ MonoBehaviour:
   - {fileID: 1293045820}
   - {fileID: 2106125531}
   fullHeartSprite: {fileID: 1303141905, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
-  emptyHeartSprite: {fileID: 0}
+  emptyHeartSprite: {fileID: 253052407, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   emptyTint: {r: 1, g: 1, b: 1, a: 0.3}
   countText: {fileID: 0}
   countFormat: '{0} / {1}'
@@ -3487,6 +3487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 683787835}
   - component: {fileID: 683787834}
+  - component: {fileID: 683787836}
   - component: {fileID: 683787833}
   - component: {fileID: 683787832}
   m_Layer: 0
@@ -3509,7 +3510,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartScreenController
   heartManager: {fileID: 683787834}
-  adService: {fileID: 683787833}
+  adService: {fileID: 683787836}
   launcher: {fileID: 1682038011}
   startPanel: {fileID: 1786235339}
   hudHeartRoot: {fileID: 0}
@@ -3548,7 +3549,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeartManager
   maxHearts: 9
   initialHearts: 3
-  regenIntervalMinutes: 60
+  regenIntervalMinutes: 30
 --- !u!4 &683787835
 Transform:
   m_ObjectHideFlags: 0
@@ -3564,6 +3565,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &683787836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683787831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d5813385c30ff54bb132900a41a20e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AdMobRewardedADService
+  androidAdUnitId: ca-app-pub-3940256099942544/5224354917
+  iosAdUnitId: ca-app-pub-3940256099942544/1712485313
+  testDeviceIds: []
+  nonMobileFallback: {fileID: 683787833}
+  retryDelay: 10
 --- !u!1 &740485750
 GameObject:
   m_ObjectHideFlags: 0

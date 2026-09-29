@@ -78,6 +78,11 @@ public class StartScreenController : MonoBehaviour
 
         // 남은 시간 표시는 매 프레임 갱신 (하트가 가득 차면 숨김)
         RefreshTimer();
+
+        // [AdMob 대응] 실제 광고는 네트워크로 받아오는 데 몇 초가 걸립니다.
+        // 시작 화면이 열린 시점엔 아직 준비가 안 됐다가 나중에 준비되는 경우가 많아서,
+        // 광고 버튼 상태를 매 프레임 다시 확인합니다. (가짜 광고는 항상 준비 상태라 이 문제가 없었음)
+        RefreshAdButton();
     }
 
     private void HandleHeartsChanged(int hearts, int max)
@@ -98,13 +103,16 @@ public class StartScreenController : MonoBehaviour
         if (startButton != null)
             startButton.interactable = hearts >= 1 && !adInProgress;
 
-        if (watchAdButton != null)
-        {
-            bool adReady = adService != null && adService.IsReady;
-            watchAdButton.interactable = !heartManager.IsFull && adReady && !adInProgress;
-        }
-
+        RefreshAdButton();
         RefreshTimer();
+    }
+
+    private void RefreshAdButton()
+    {
+        if (watchAdButton == null || heartManager == null) return;
+
+        bool adReady = adService != null && adService.IsReady;
+        watchAdButton.interactable = !heartManager.IsFull && adReady && !adInProgress;
     }
 
     private void RefreshTimer()
