@@ -22,6 +22,10 @@ public class LoadingScreenController : MonoBehaviour
              "그 아래에서 조작이 먼저 반응해버릴 수 있습니다. 이 컴포넌트를 꺼둬서 원천 차단합니다.")]
     public LauncherController launcher;
 
+    [Tooltip("닉네임 입력이 끝난 뒤 보여줄 시작 화면(하트 확인 + 시작 버튼). " +
+             "비워두면 예전처럼 닉네임 Submit 직후 바로 게임이 시작됩니다.")]
+    public StartScreenController startScreen;
+
     [Header("로딩 화면 UI")]
     [Tooltip("로딩 캔버스 전체(닉네임 입력 포함)를 담는 오브젝트. 최종적으로 이게 꺼지면 게임이 드러남")]
     public GameObject loadingPanel;
@@ -46,6 +50,21 @@ public class LoadingScreenController : MonoBehaviour
 
     void Start()
     {
+        // 게임오버 후 재시작이면 로딩 화면과 닉네임 입력을 건너뛰고 바로 시작 화면(하트 확인)으로 갑니다.
+        // 닉네임이 저장되어 있지 않은 예외적인 경우에는 일반 흐름을 그대로 탑니다.
+        if (SessionState.IsRestart && startScreen != null && PlayerPrefs.HasKey(LastNicknamePrefsKey))
+        {
+            SessionState.IsRestart = false;
+
+            if (loadingPanel != null) loadingPanel.SetActive(false);
+            if (launcher != null) launcher.enabled = false; // 시작 버튼을 누르기 전까지는 조작 차단
+
+            startScreen.Show();
+            return;
+        }
+
+        SessionState.IsRestart = false;
+
         if (loadingPanel != null) loadingPanel.SetActive(true);
         if (loadingContent != null) loadingContent.SetActive(true);
         if (nameEntryPanel != null) nameEntryPanel.SetActive(false);
@@ -105,8 +124,15 @@ public class LoadingScreenController : MonoBehaviour
         if (loadingPanel != null)
             loadingPanel.SetActive(false);
 
-        // 이제서야 발사대 조작을 허용
-        if (launcher != null)
+        if (startScreen != null)
+        {
+            // 하트를 확인하고 "시작"을 눌러야 게임이 시작됩니다 (발사대는 시작 화면에서 켭니다)
+            startScreen.Show();
+        }
+        else if (launcher != null)
+        {
+            // 시작 화면이 연결되지 않았다면 예전처럼 바로 시작
             launcher.enabled = true;
+        }
     }
 }

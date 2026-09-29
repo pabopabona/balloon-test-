@@ -128,6 +128,8 @@ MonoBehaviour:
   stringRenderer: {fileID: 855907305044721013}
   collisionRadius: 1.2
   ceilingY: 8.9
+  maxStepDistance: 0.1
+  maxStepsPerFrame: 60
 --- !u!1 &5029188880730217755
 GameObject:
   m_ObjectHideFlags: 0

@@ -39,6 +39,20 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)]
     public float sfxVolume = 1f;
 
+    [Header("터짐 소리 피치 랜덤")]
+    [Tooltip("풍선이 터질 때마다 피치(음높이)를 이 범위 안에서 무작위로 정합니다. 1이 원래 음높이예요. " +
+             "너무 넓히면 어색해지니 0.9 ~ 1.1 정도로 살짝만 주는 걸 추천해요. 둘 다 1로 두면 랜덤이 꺼집니다.")]
+    [Range(0.5f, 2f)] public float popPitchMin = 0.92f;
+    [Range(0.5f, 2f)] public float popPitchMax = 1.08f;
+
+    [Header("효과음 동시 재생")]
+    [Tooltip("효과음을 겹쳐 재생하기 위한 오디오 소스 개수. 피치는 소스 단위로 적용되기 때문에, " +
+             "소리마다 다른 피치를 주려면 소스를 여러 개 돌려 써야 합니다. 터짐이 연달아 일어나는 게임이라 넉넉하게 잡아두세요.")]
+    [Range(2, 16)] public int sfxPoolSize = 8;
+
+    private AudioSource[] sfxPool;
+    private int sfxPoolIndex;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -53,6 +67,8 @@ public class AudioManager : MonoBehaviour
             sfxSource = gameObject.AddComponent<AudioSource>();
             sfxSource.playOnAwake = false;
         }
+
+        BuildSfxPool();
 
         if (musicSource == null)
         {
@@ -104,7 +120,11 @@ public class AudioManager : MonoBehaviour
 
     private void HandleShoot(Vector3 spawnPos, Vector2 velocity) => PlayClip(shootClip);
     private void HandleAttached() => PlayClip(attachClip);
-    private void HandlePopped(int count) => PlayClip(popClip);
+    private void HandlePopped(int count)
+    {
+        float pitch = Random.Range(Mathf.Min(popPitchMin, popPitchMax), Mathf.Max(popPitchMin, popPitchMax));
+        PlayClip(popClip, pitch);
+    }
     private void HandleCombo(int comboDepth)
     {
         if (comboDepth >= 2)
@@ -126,8 +146,61 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayClip(AudioClip clip)
     {
-        if (clip == null || sfxSource == null) return;
-        sfxSource.PlayOneShot(clip, sfxVolume);
+        PlayClip(clip, 1f);
+    }
+
+    /// <summary>
+    /// 지정한 피치(1 = 원래 음높이)로 효과음을 재생합니다. 소스 풀에서 다음 소스를 골라
+    /// 그 소스에만 피치를 적용하므로, 이미 재생 중인 다른 효과음의 음높이는 바뀌지 않습니다.
+    /// </summary>
+    public void PlayClip(AudioClip clip, float pitch)
+    {
+        if (clip == null) return;
+
+        AudioSource source = NextPooledSource();
+        if (source == null) return;
+
+        source.pitch = pitch;
+        source.volume = sfxVolume;
+        source.clip = clip;
+        source.Play();
+    }
+
+    private void BuildSfxPool()
+    {
+        sfxPool = new AudioSource[Mathf.Max(2, sfxPoolSize)];
+
+        for (int i = 0; i < sfxPool.Length; i++)
+        {
+            // 첫 번째는 Inspector에서 연결했거나 위에서 만든 sfxSource를 그대로 재사용
+            AudioSource src = (i == 0 && sfxSource != null)
+                ? sfxSource
+                : gameObject.AddComponent<AudioSource>();
+
+            src.playOnAwake = false;
+            src.loop = false;
+            sfxPool[i] = src;
+        }
+    }
+
+    private AudioSource NextPooledSource()
+    {
+        if (sfxPool == null || sfxPool.Length == 0) return sfxSource;
+
+        // 아직 재생 중이 아닌 소스를 우선 사용하고, 전부 재생 중이면 가장 오래된 소스를 끊고 재사용
+        for (int i = 0; i < sfxPool.Length; i++)
+        {
+            int idx = (sfxPoolIndex + i) % sfxPool.Length;
+            if (!sfxPool[idx].isPlaying)
+            {
+                sfxPoolIndex = (idx + 1) % sfxPool.Length;
+                return sfxPool[idx];
+            }
+        }
+
+        AudioSource fallback = sfxPool[sfxPoolIndex];
+        sfxPoolIndex = (sfxPoolIndex + 1) % sfxPool.Length;
+        return fallback;
     }
 
     /// <summary>

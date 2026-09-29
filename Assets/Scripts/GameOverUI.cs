@@ -52,6 +52,9 @@ public class GameOverUI : MonoBehaviour
     /// </summary>
     public void RestartGame()
     {
+        // 재시작이라는 표시를 남겨서, 다음 씬 로드에서 로딩/닉네임 입력을 건너뛰게 합니다.
+        SessionState.IsRestart = true;
+
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
     }

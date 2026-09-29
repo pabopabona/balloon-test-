@@ -64,6 +64,18 @@ public class LauncherController : MonoBehaviour
     private float minX;
     private float maxX;
     private bool isDragging = false;
+
+    [Header("조작 영역 (발사대를 직접 잡아야 움직임)")]
+    [Tooltip("발사대를 '잡을 수 있는' 영역의 크기(월드 유닛). 발사대 그래픽을 살짝 덮는 정도로 맞추세요. " +
+             "이 영역 밖을 터치하면 아무 반응이 없어서, 실수로 화면을 건드려도 발사대가 튀지 않습니다. " +
+             "Scene 뷰에서 Launcher를 선택하면 노란 박스로 이 영역이 보입니다.")]
+    public Vector2 grabBoxSize = new Vector2(4f, 3f);
+
+    [Tooltip("잡기 영역의 중심을 발사대 위치에서 얼마나 옮길지(월드 유닛). 그래픽 중심이 어긋나 있을 때 조정")]
+    public Vector2 grabBoxOffset = Vector2.zero;
+
+    // 발사대를 잡은 순간의 (발사대 x - 손가락 x). 이 차이를 유지해서 잡은 지점 그대로 따라오게 함
+    private float grabOffsetX = 0f;
     private float holdTimer = 0f;
 
     void Awake()
@@ -134,10 +146,12 @@ public class LauncherController : MonoBehaviour
     private void HandleInput()
     {
         // 마우스(에디터 테스트용) / 터치(모바일) 공용 처리
+        // 핵심: 터치를 "시작"한 위치가 발사대 잡기 영역 안일 때만 드래그를 시작합니다.
+        // 영역 밖에서 시작한 터치는 이동도, 발사도 일으키지 않습니다.
 #if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetMouseButtonDown(0))
         {
-            StartDragging();
+            TryBeginDrag(Input.mousePosition);
         }
         if (Input.GetMouseButton(0) && isDragging)
         {
@@ -156,8 +170,7 @@ public class LauncherController : MonoBehaviour
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    StartDragging();
-                    MoveToScreenPosition(touch.position);
+                    TryBeginDrag(touch.position);
                     break;
                 case TouchPhase.Moved:
                 case TouchPhase.Stationary:
@@ -177,9 +190,29 @@ public class LauncherController : MonoBehaviour
 #endif
     }
 
-    private void StartDragging()
+    /// <summary>
+    /// 터치 시작 위치가 발사대 잡기 영역 안이면 드래그를 시작하고, 잡은 지점의 오프셋을 기억합니다.
+    /// </summary>
+    private void TryBeginDrag(Vector3 screenPosition)
     {
+        if (mainCamera == null) return;
+
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(
+            new Vector3(screenPosition.x, screenPosition.y, -mainCamera.transform.position.z));
+
+        if (!IsInsideGrabBox(worldPos)) return;
+
         isDragging = true;
+        grabOffsetX = transform.position.x - worldPos.x;
+    }
+
+    private bool IsInsideGrabBox(Vector3 worldPos)
+    {
+        Vector2 center = (Vector2)transform.position + grabBoxOffset;
+        Vector2 half = grabBoxSize * 0.5f;
+
+        return Mathf.Abs(worldPos.x - center.x) <= half.x
+            && Mathf.Abs(worldPos.y - center.y) <= half.y;
     }
 
     /// <summary>
@@ -194,7 +227,7 @@ public class LauncherController : MonoBehaviour
         Vector3 worldPos = mainCamera.ScreenToWorldPoint(
             new Vector3(screenPosition.x, screenPosition.y, -mainCamera.transform.position.z));
 
-        float targetX = Mathf.Clamp(worldPos.x, minX, maxX);
+        float targetX = Mathf.Clamp(worldPos.x + grabOffsetX, minX, maxX);
 
         Vector3 newPos = transform.position;
 
@@ -237,6 +270,11 @@ public class LauncherController : MonoBehaviour
         {
             CalculateHorizontalBounds();
         }
+
+        // 발사대를 잡을 수 있는 영역(터치가 이 안에서 시작해야 조작됨)을 시안색 박스로 표시
+        Gizmos.color = Color.cyan;
+        Vector3 grabCenter = transform.position + (Vector3)grabBoxOffset;
+        Gizmos.DrawWireCube(grabCenter, new Vector3(grabBoxSize.x, grabBoxSize.y, 0f));
 
         Gizmos.color = Color.yellow;
         Vector3 leftPoint = new Vector3(minX, transform.position.y, 0);
