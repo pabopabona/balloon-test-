@@ -36,6 +36,18 @@ public class AudioManager : MonoBehaviour
     public AudioClip gameOverClip;
     public AudioClip buttonClip;
 
+    [Header("특수 풍선 효과음")]
+    [Tooltip("회색 풍선 매칭(가로 한 줄 터짐) 시 재생할 전기 효과음. 비워두면 일반 터짐 소리가 납니다.")]
+    public AudioClip grayElectricClip;
+
+    [Tooltip("체크하면 회색 매칭 때 전기 소리 + 일반 터짐 소리를 같이 냅니다. " +
+             "끄면 전기 소리만 납니다.")]
+    public bool playPopWithElectric = false;
+
+    [Range(0f, 1f)]
+    [Tooltip("전기 효과음만 따로 볼륨 조절 (1 = 효과음 볼륨과 동일, 더 키우려면 클립 자체 음량을 올리세요)")]
+    public float electricVolumeScale = 1f;
+
     [Range(0f, 1f)]
     public float sfxVolume = 1f;
 
@@ -94,7 +106,7 @@ public class AudioManager : MonoBehaviour
         if (gridManager != null)
         {
             gridManager.OnBalloonAttached += HandleAttached;
-            gridManager.OnBalloonsPopped += HandlePopped;
+            gridManager.OnMatchPopped += HandleMatchPopped;
             gridManager.OnComboStep += HandleCombo;
         }
 
@@ -110,7 +122,7 @@ public class AudioManager : MonoBehaviour
         if (gridManager != null)
         {
             gridManager.OnBalloonAttached -= HandleAttached;
-            gridManager.OnBalloonsPopped -= HandlePopped;
+            gridManager.OnMatchPopped -= HandleMatchPopped;
             gridManager.OnComboStep -= HandleCombo;
         }
 
@@ -120,7 +132,22 @@ public class AudioManager : MonoBehaviour
 
     private void HandleShoot(Vector3 spawnPos, Vector2 velocity) => PlayClip(shootClip);
     private void HandleAttached() => PlayClip(attachClip);
-    private void HandlePopped(int count)
+    /// <summary>
+    /// 매칭으로 풍선이 터졌을 때 호출됩니다. 회색 매칭이면 전기 효과음, 그 외에는 일반 터짐 소리.
+    /// </summary>
+    private void HandleMatchPopped(BalloonColor color, int count)
+    {
+        if (color == BalloonColor.Gray && grayElectricClip != null)
+        {
+            PlayClip(grayElectricClip, 1f, sfxVolume * electricVolumeScale);
+
+            if (!playPopWithElectric) return;
+        }
+
+        PlayPopSound();
+    }
+
+    private void PlayPopSound()
     {
         float pitch = Random.Range(Mathf.Min(popPitchMin, popPitchMax), Mathf.Max(popPitchMin, popPitchMax));
         PlayClip(popClip, pitch);
@@ -155,13 +182,19 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlayClip(AudioClip clip, float pitch)
     {
+        PlayClip(clip, pitch, sfxVolume);
+    }
+
+    /// <summary>피치와 볼륨을 모두 지정해서 재생합니다.</summary>
+    public void PlayClip(AudioClip clip, float pitch, float volume)
+    {
         if (clip == null) return;
 
         AudioSource source = NextPooledSource();
         if (source == null) return;
 
         source.pitch = pitch;
-        source.volume = sfxVolume;
+        source.volume = Mathf.Clamp01(volume);
         source.clip = clip;
         source.Play();
     }

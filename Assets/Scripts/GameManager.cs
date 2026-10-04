@@ -113,6 +113,28 @@ public class GameManager : MonoBehaviour
         Score += gained;
         OnScoreChanged?.Invoke(Score);
 
+        AddLevelProgress(count);
+    }
+
+    /// <summary>
+    /// 스킬(회색 스킬의 화면 전체 터뜨리기 등)로 터진 풍선을 점수에 반영합니다.
+    /// countTowardLevelUp이 false면 점수만 오르고 레벨업 진행도에는 넣지 않습니다
+    /// (수십 개가 한 번에 터져 레벨이 여러 단계 뛰는 것을 막기 위함).
+    /// </summary>
+    public void AddSkillPops(int count, bool countTowardLevelUp)
+    {
+        if (count <= 0 || IsGameOver) return;
+
+        Score += count * pointsPerBalloon;
+        OnScoreChanged?.Invoke(Score);
+
+        if (countTowardLevelUp) AddLevelProgress(count);
+    }
+
+    private void AddLevelProgress(int count)
+    {
+        if (launcher == null) return;
+
         poppedSinceLevelStart += count;
         int threshold = GetThresholdForLevel(launcher.currentLevel);
 

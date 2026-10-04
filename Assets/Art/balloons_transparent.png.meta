@@ -563,10 +563,10 @@ TextureImporter:
       name: balloons_Heart
       rect:
         serializedVersion: 2
-        x: 1108
-        y: 547
-        width: 332
-        height: 316
+        x: 1505
+        y: 434
+        width: 276
+        height: 259
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -585,10 +585,10 @@ TextureImporter:
       name: balloons_emptyheart
       rect:
         serializedVersion: 2
-        x: 1447
-        y: 547
-        width: 332
-        height: 316
+        x: 1857
+        y: 437
+        width: 270
+        height: 249
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -599,6 +599,116 @@ TextureImporter:
       bones: []
       spriteID: 0fbd5a0c5a3b332419627b70b1c3fc26
       internalID: 253052407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_timer
+      rect:
+        serializedVersion: 2
+        x: 1626
+        y: 52
+        width: 370
+        height: 364
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33dd10eb615d95d40ba42015b0815900
+      internalID: -924281198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_electric
+      rect:
+        serializedVersion: 2
+        x: 1767
+        y: 958
+        width: 432
+        height: 450
+      alignment: 9
+      pivot: {x: 0.51992804, y: 0.4698189}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9349b35d79bd70458012c1fbaaf83b1
+      internalID: 1898527699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_timerTXT
+      rect:
+        serializedVersion: 2
+        x: 1165
+        y: 706
+        width: 704
+        height: 236
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13e4fb7923d977244ac99dc54ee53162
+      internalID: -392044257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_clearTXT
+      rect:
+        serializedVersion: 2
+        x: 1008
+        y: 955
+        width: 746
+        height: 254
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5025b316ff3cd2641a9bfff5dbcd8599
+      internalID: 870552806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloons_comboTXT
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 1221
+        width: 778
+        height: 281
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4bbffb0a8592d3d439c787ea5b75f899
+      internalID: -62911642
       vertices: []
       indices: 
       edges: []
@@ -628,7 +738,12 @@ TextureImporter:
       balloon_wheel: -2000288062934283341
       balloon_yellow: 8283810527293456571
       balloons_Heart: 1303141905
+      balloons_clearTXT: 870552806
+      balloons_comboTXT: -62911642
+      balloons_electric: 1898527699
       balloons_emptyheart: 253052407
+      balloons_timer: -924281198
+      balloons_timerTXT: -392044257
       balloons_transparent_15: -171407145272213096
       balloonstring_blue: 8957283353454636840
       balloonstring_darkgray: 7572218023283381857

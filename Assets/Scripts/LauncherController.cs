@@ -37,6 +37,29 @@ public class LauncherController : MonoBehaviour
     [Tooltip("레벨에 따라 허용 시간이 줄어드는 속도. 값이 클수록 초반 레벨부터 빠르게 짧아짐")]
     public float decayRate = 0.15f;
 
+    [Header("스킬: 타이머 완화 (레인보우 스킬)")]
+    [Tooltip("홀드 타이머를 계산할 때 현재 레벨에서 빼주는 값. 레인보우 스킬이 발동하면 자동으로 늘어납니다. " +
+             "예: 레벨 10에서 이 값이 5면, 타이머는 레벨 5일 때의 속도로 흐릅니다. " +
+             "풍선 색 등장 등 다른 레벨 규칙에는 영향을 주지 않습니다.")]
+    public int holdLevelOffset = 0;
+
+    /// <summary>홀드 타이머 계산에 실제로 쓰이는 레벨 (현재 레벨 - 완화 값, 최소 1).</summary>
+    public int EffectiveHoldLevel => Mathf.Max(1, currentLevel - holdLevelOffset);
+
+    /// <summary>
+    /// 홀드 타이머를 느리게 되돌립니다. ratio가 0.5면 "타이머 기준 레벨"을 절반으로 낮춥니다.
+    /// (레벨 10에서 발동 → 레벨 5의 속도. 이후 레벨이 오르면 거기서부터 다시 조금씩 빨라짐)
+    /// 진행 중이던 타이머도 0으로 되돌려 줍니다.
+    /// </summary>
+    public void ApplyHoldTimerRelief(float ratio = 0.5f)
+    {
+        int newEffective = Mathf.Max(1, Mathf.RoundToInt(EffectiveHoldLevel * Mathf.Clamp01(ratio)));
+        holdLevelOffset = currentLevel - newEffective;
+
+        holdTimer = 0f;
+        OnHoldTimeChanged?.Invoke(holdTimer, GetMaxHoldTime());
+    }
+
     /// <summary>
     /// 홀드 시간이 갱신될 때마다 (경과시간, 최대허용시간)을 전달하는 이벤트.
     /// UI에 타이머 바/게이지 등을 붙일 때 구독해서 사용하면 됩니다.
@@ -112,13 +135,40 @@ public class LauncherController : MonoBehaviour
     /// </summary>
     public float GetMaxHoldTime()
     {
-        float t = Mathf.Exp(-decayRate * (currentLevel - 1));
+        // 레인보우 스킬로 완화된 레벨(EffectiveHoldLevel)을 기준으로 계산합니다.
+        float t = Mathf.Exp(-decayRate * (EffectiveHoldLevel - 1));
         float value = minHoldTime + (baseHoldTime - minHoldTime) * t;
         return Mathf.Max(value, minHoldTime);
     }
 
+    /// <summary>
+    /// true인 동안에는 터치 입력과 홀드 타이머가 모두 멈춥니다. (스킬 발동 시 "잠깐 멈춤" 연출용)
+    /// </summary>
+    public bool InputPaused { get; private set; }
+
+    /// <summary>
+    /// 발사대 입력/타이머를 잠깐 멈추거나 다시 풉니다.
+    /// 멈춘 동안 손가락을 뗐다면, 풀릴 때 드래그 상태를 정리해서 발사대가 엉뚱하게 따라오지 않게 합니다.
+    /// (계속 누르고 있었다면 잡은 상태가 그대로 이어집니다)
+    /// </summary>
+    public void SetInputPaused(bool paused)
+    {
+        InputPaused = paused;
+
+        if (!paused)
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE
+            if (!Input.GetMouseButton(0)) isDragging = false;
+#else
+            if (Input.touchCount == 0) isDragging = false;
+#endif
+        }
+    }
+
     void Update()
     {
+        if (InputPaused) return;
+
         HandleInput();
         HandleHoldTimer();
     }

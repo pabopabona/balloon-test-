@@ -32,6 +32,14 @@ public class HexGridManager : MonoBehaviour
     public System.Action OnDangerLineReached;
 
     public System.Action<int> OnBalloonsPopped;
+
+    /// <summary>
+    /// 매칭으로 풍선이 터질 때 "어떤 색 매칭이었는지"와 터진 개수를 함께 알려줍니다.
+    /// (회색 매칭 시 전기 효과음처럼, 색에 따라 다른 연출을 붙일 때 사용)
+    /// 점수 계산은 기존 OnBalloonsPopped를 그대로 사용합니다.
+    /// </summary>
+    public System.Action<BalloonColor, int> OnMatchPopped;
+
     public System.Action OnBalloonAttached;
 
     /// <summary>
@@ -391,6 +399,7 @@ public class HexGridManager : MonoBehaviour
 
             comboDepth++;
             OnBalloonsPopped?.Invoke(poppedCells.Count);
+            OnMatchPopped?.Invoke(targetColor, poppedCells.Count);
             OnComboStep?.Invoke(comboDepth);
         }
 
@@ -455,6 +464,80 @@ public class HexGridManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 회색 스킬 전용: 맨 위 keepTopRows줄만 남기고, 그 아래 화면의 모든 풍선을 터뜨립니다.
+    /// 터진 개수를 반환합니다. (점수 이벤트는 발생시키지 않으므로, 호출한 쪽에서 점수를 처리하세요)
+    ///
+    /// 격자 데이터에서는 "즉시" 전부 제거하고, 화면에서 터지는 연출만 윗줄부터 rowDelay 간격으로
+    /// 차례로 보여줍니다. 연출이 끝나기 전에 다음 풍선을 쏘더라도, 사라질 풍선에 붙지 않도록
+    /// 상태를 미리 Popped로 바꿔둡니다.
+    ///
+    /// useSingleEffect가 true면 풍선 색과 상관없이 전부 effectColor(기본: 회색 = 일렉트릭)의
+    /// 이펙트 프리팹 하나로만 터집니다. 같은 프리팹/머티리얼만 쓰게 되어 렌더링이 가벼워집니다.
+    ///
+    /// overrideEffectPrefab을 넘기면 위 설정과 상관없이 모든 풍선이 그 프리팹으로 터집니다
+    /// (스킬 전용 이펙트를 일반 회색 매칭 이펙트와 따로 쓰고 싶을 때).
+    /// </summary>
+    public int PopAllBelowTopRows(int keepTopRows = 1, float rowDelay = 0.04f,
+                                  bool useSingleEffect = true, BalloonColor effectColor = BalloonColor.Gray,
+                                  GameObject overrideEffectPrefab = null)
+    {
+        List<Vector2Int> cells = new List<Vector2Int>();
+        foreach (KeyValuePair<Vector2Int, Balloon> pair in grid)
+        {
+            if (pair.Key.x >= keepTopRows) cells.Add(pair.Key);
+        }
+
+        if (cells.Count == 0) return 0;
+
+        // 윗줄부터, 같은 줄에서는 왼쪽부터
+        cells.Sort((a, b) => a.x != b.x ? a.x.CompareTo(b.x) : a.y.CompareTo(b.y));
+
+        List<Balloon> targets = new List<Balloon>();
+        List<int> targetRows = new List<int>();
+
+        foreach (Vector2Int cell in cells)
+        {
+            Balloon b = grid[cell];
+            grid.Remove(cell);
+
+            if (b == null) continue;
+
+            b.state = Balloon.BalloonState.Popped;
+            targets.Add(b);
+            targetRows.Add(cell.x);
+        }
+
+        StartCoroutine(PopWaveRoutine(targets, targetRows, rowDelay, useSingleEffect, effectColor, overrideEffectPrefab));
+        return targets.Count;
+    }
+
+    private IEnumerator PopWaveRoutine(List<Balloon> targets, List<int> targetRows, float rowDelay,
+                                       bool useSingleEffect, BalloonColor effectColor,
+                                       GameObject overrideEffectPrefab)
+    {
+        int currentRow = targetRows.Count > 0 ? targetRows[0] : 0;
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (rowDelay > 0f && targetRows[i] != currentRow)
+            {
+                currentRow = targetRows[i];
+                yield return new WaitForSeconds(rowDelay);
+            }
+
+            Balloon b = targets[i];
+            if (b == null) continue;
+
+            if (overrideEffectPrefab != null)
+                SpawnEffect(overrideEffectPrefab, b.transform.position);
+            else
+                SpawnPopEffect(b.transform.position, useSingleEffect ? effectColor : b.color);
+
+            Destroy(b.gameObject);
+        }
     }
 
     private IEnumerator ProcessPopCascadeRoutine(List<Vector2Int> poppedCells)
@@ -546,7 +629,15 @@ public class HexGridManager : MonoBehaviour
         int idx = (int)color;
         if (idx < 0 || idx >= popEffectPrefabsByColor.Length) return;
 
-        GameObject prefab = popEffectPrefabsByColor[idx];
+        SpawnEffect(popEffectPrefabsByColor[idx], worldPosition);
+    }
+
+    /// <summary>
+    /// 임의의 이펙트 프리팹을 월드 좌표 위치에 생성합니다. UI(RectTransform) 프리팹이면
+    /// effectCanvas 아래에, 일반 프리팹이면 월드에 그대로 생성합니다.
+    /// </summary>
+    public void SpawnEffect(GameObject prefab, Vector3 worldPosition)
+    {
         if (prefab == null) return;
 
         RectTransform prefabRect = prefab.GetComponent<RectTransform>();

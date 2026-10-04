@@ -119,7 +119,9 @@ public class StartScreenController : MonoBehaviour
     {
         if (timerText == null || heartManager == null) return;
 
-        if (heartManager.IsFull)
+        // 타이머 충전은 regenMaxHearts(기본 5개)까지만 됩니다. 그 이상이면 충전이 멈추므로 타이머를 숨깁니다.
+        // (광고 버튼은 최대치 maxHearts(9개)가 될 때까지 계속 쓸 수 있습니다)
+        if (heartManager.IsRegenFull)
         {
             timerText.gameObject.SetActive(false);
             return;
