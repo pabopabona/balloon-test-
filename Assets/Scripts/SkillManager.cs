@@ -8,11 +8,13 @@ using TMPro;
 ///
 /// 레인보우 스킬 (타이머 완화)
 ///   - 레인보우 매칭(3개 이상 터뜨리기)을 rainbowMatchesRequired번(기본 5) 하면 즉시 발동
+///   - 발동할 때마다 다음에 필요한 횟수가 rainbowRequiredIncrease(기본 1)씩 늘어남: 5 → 6 → 7 ...
 ///   - 발사(홀드) 타이머의 기준 레벨을 절반으로 낮춤: 레벨 10에서 발동 → 레벨 5의 속도
 ///   - 이후 레벨이 오르면 거기서부터 다시 조금씩 빨라짐 (여러 번 발동하면 그때마다 다시 절반)
 ///
 /// 회색 스킬 (화면 정리)
 ///   - 회색 매칭을 grayMatchesRequired번(기본 5) 하면 발동
+///   - 발동할 때마다 다음에 필요한 횟수가 grayRequiredIncrease(기본 1)씩 늘어남: 5 → 6 → 7 ...
 ///   - 맨 위 keepTopRows줄(기본 1줄)만 남기고 화면의 풍선을 전부 터뜨림
 ///   - 진행 중이던 연쇄 반응이 다 끝난 직후에 실행됩니다(격자가 꼬이지 않도록)
 ///
@@ -42,6 +44,7 @@ public class SkillManager : MonoBehaviour
 
         [System.NonSerialized] public float shownFill;   // 화면에 보이는 채움 정도(부드럽게 따라감)
         [System.NonSerialized] public float flashUntil;  // 이 시각까지는 "가득 참" 상태로 표시
+        [System.NonSerialized] public int flashRequired; // 가득 참 표시 중에 보여줄 횟수 (방금 채운 횟수)
     }
 
     [Header("참조")]
@@ -52,6 +55,9 @@ public class SkillManager : MonoBehaviour
     [Header("레인보우 스킬 - 타이머 완화")]
     [Tooltip("레인보우 매칭을 몇 번 하면 발동할지")]
     public int rainbowMatchesRequired = 5;
+
+    [Tooltip("발동할 때마다 다음에 필요한 횟수를 얼마나 늘릴지. 1이면 5 → 6 → 7 ..., 0이면 항상 같음")]
+    public int rainbowRequiredIncrease = 1;
 
     [Tooltip("타이머 기준 레벨을 얼마로 낮출지. 0.5면 절반(레벨 10 → 레벨 5의 속도)")]
     [Range(0.1f, 1f)] public float timerLevelRatio = 0.5f;
@@ -64,6 +70,9 @@ public class SkillManager : MonoBehaviour
     [Header("회색 스킬 - 화면 정리")]
     [Tooltip("회색 매칭을 몇 번 하면 발동할지")]
     public int grayMatchesRequired = 5;
+
+    [Tooltip("발동할 때마다 다음에 필요한 횟수를 얼마나 늘릴지. 1이면 5 → 6 → 7 ..., 0이면 항상 같음")]
+    public int grayRequiredIncrease = 1;
 
     [Tooltip("맨 위에서 몇 줄을 남길지")]
     public int keepTopRows = 1;
@@ -120,6 +129,18 @@ public class SkillManager : MonoBehaviour
     private int grayCount;
     private bool graySkillPending; // 회색 스킬이 발동 대기 중(연쇄가 끝나면 실행)
 
+    // 이번 판에서 각 스킬이 발동한 횟수. 씬을 다시 불러오면(새 판) 0으로 돌아갑니다.
+    private int rainbowActivations;
+    private int grayActivations;
+
+    /// <summary>지금 레인보우 스킬 발동에 필요한 매칭 횟수 (발동할 때마다 늘어남).</summary>
+    public int CurrentRainbowRequired =>
+        Mathf.Max(1, rainbowMatchesRequired + rainbowActivations * Mathf.Max(0, rainbowRequiredIncrease));
+
+    /// <summary>지금 회색 스킬 발동에 필요한 매칭 횟수 (발동할 때마다 늘어남).</summary>
+    public int CurrentGrayRequired =>
+        Mathf.Max(1, grayMatchesRequired + grayActivations * Mathf.Max(0, grayRequiredIncrease));
+
     private int pauseDepth;          // 멈춤이 겹쳤을 때를 대비한 카운터
     private float savedTimeScale = 1f;
     private Coroutine rainbowBannerRoutine;
@@ -139,8 +160,8 @@ public class SkillManager : MonoBehaviour
             gridManager.OnPlacementSettled += HandlePlacementSettled;
         }
 
-        RefreshGauge(rainbowGauge, rainbowCount, rainbowMatchesRequired, true);
-        RefreshGauge(grayGauge, grayCount, grayMatchesRequired, true);
+        RefreshGauge(rainbowGauge, rainbowCount, CurrentRainbowRequired, true);
+        RefreshGauge(grayGauge, grayCount, CurrentGrayRequired, true);
     }
 
     void OnDisable()
@@ -163,8 +184,8 @@ public class SkillManager : MonoBehaviour
 
     void Update()
     {
-        RefreshGauge(rainbowGauge, rainbowCount, rainbowMatchesRequired, false);
-        RefreshGauge(grayGauge, grayCount, grayMatchesRequired, false);
+        RefreshGauge(rainbowGauge, rainbowCount, CurrentRainbowRequired, false);
+        RefreshGauge(grayGauge, grayCount, CurrentGrayRequired, false);
     }
 
     // ───────────── 매칭 집계 ─────────────
@@ -176,20 +197,29 @@ public class SkillManager : MonoBehaviour
         if (color == BalloonColor.Rainbow)
         {
             rainbowCount++;
-            if (rainbowCount >= Mathf.Max(1, rainbowMatchesRequired))
+            if (rainbowCount >= CurrentRainbowRequired)
             {
+                if (rainbowGauge != null) rainbowGauge.flashRequired = CurrentRainbowRequired;
+
                 rainbowCount = 0;
+                rainbowActivations++; // 다음에는 필요한 횟수가 늘어남
                 ActivateRainbowSkill();
             }
         }
         else if (color == BalloonColor.Gray)
         {
             grayCount++;
-            if (grayCount >= Mathf.Max(1, grayMatchesRequired))
+            if (grayCount >= CurrentGrayRequired)
             {
+                if (grayGauge != null)
+                {
+                    grayGauge.flashRequired = CurrentGrayRequired;
+                    grayGauge.flashUntil = float.PositiveInfinity; // 발동할 때까지 가득 찬 상태 유지
+                }
+
                 grayCount = 0;
+                grayActivations++; // 다음에는 필요한 횟수가 늘어남
                 graySkillPending = true; // 실제 실행은 연쇄가 다 끝난 뒤(HandlePlacementSettled)
-                if (grayGauge != null) grayGauge.flashUntil = float.PositiveInfinity; // 발동할 때까지 가득 찬 상태 유지
             }
         }
     }
@@ -204,7 +234,7 @@ public class SkillManager : MonoBehaviour
         if (launcher != null)
         {
             launcher.ApplyHoldTimerRelief(timerLevelRatio);
-            Debug.Log($"[Skill] 레인보우 스킬 발동: 타이머 기준 레벨 {launcher.EffectiveHoldLevel} (현재 레벨 {launcher.currentLevel})");
+            Debug.Log($"[Skill] 레인보우 스킬 발동: 타이머 기준 레벨 {launcher.EffectiveHoldLevel} (현재 레벨 {launcher.currentLevel}), 다음 필요 횟수 {CurrentRainbowRequired}");
         }
 
         PlaySkillClip(rainbowSkillClip);
@@ -252,7 +282,7 @@ public class SkillManager : MonoBehaviour
         int popped = gridManager.PopAllBelowTopRows(
             Mathf.Max(0, keepTopRows), popWaveRowDelay, useElectricEffectForAll, BalloonColor.Gray,
             graySkillPopEffectPrefab);
-        Debug.Log($"[Skill] 회색 스킬 발동: {popped}개 터짐");
+        Debug.Log($"[Skill] 회색 스킬 발동: {popped}개 터짐, 다음 필요 횟수 {CurrentGrayRequired}");
 
         // 스킬로 터진 풍선은 점수만 주고, 레벨업 진행도에는 넣지 않습니다
         // (수십 개가 한 번에 터져 레벨이 여러 단계 뛰는 것을 방지)
@@ -332,7 +362,11 @@ public class SkillManager : MonoBehaviour
             gauge.fillImage.fillAmount = gauge.shownFill;
 
         if (gauge.countText != null)
-            gauge.countText.text = string.Format(countFormat, flashing ? required : count, required);
+        {
+            // 가득 참 표시 중에는 방금 채운 횟수(예: 5/5)를 보여주고, 그 뒤부터 새 횟수(예: 0/6)로 바뀝니다.
+            int shownRequired = flashing && gauge.flashRequired > 0 ? gauge.flashRequired : required;
+            gauge.countText.text = string.Format(countFormat, flashing ? shownRequired : count, shownRequired);
+        }
     }
 
     private void PlaySkillClip(AudioClip clip)
