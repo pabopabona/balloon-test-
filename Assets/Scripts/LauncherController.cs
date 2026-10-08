@@ -142,34 +142,34 @@ public class LauncherController : MonoBehaviour
     }
 
     /// <summary>
-    /// true인 동안에는 터치 입력과 홀드 타이머가 모두 멈춥니다. (스킬 발동 시 "잠깐 멈춤" 연출용)
+    /// true인 동안에는 "발사"와 홀드 타이머만 멈춥니다. (스킬 발동 시 "잠깐 멈춤" 연출용)
+    /// 발사대를 잡고 좌우로 움직이는 것은 멈춘 동안에도 그대로 됩니다.
     /// </summary>
     public bool InputPaused { get; private set; }
 
+    // 멈춘 동안 손가락을 떼서 발사하려 했는지. 멈춤이 풀리는 순간 발사합니다.
+    private bool shootQueued;
+
     /// <summary>
-    /// 발사대 입력/타이머를 잠깐 멈추거나 다시 풉니다.
-    /// 멈춘 동안 손가락을 뗐다면, 풀릴 때 드래그 상태를 정리해서 발사대가 엉뚱하게 따라오지 않게 합니다.
-    /// (계속 누르고 있었다면 잡은 상태가 그대로 이어집니다)
+    /// 발사와 홀드 타이머를 잠깐 멈추거나 다시 풉니다. 발사대 이동은 막지 않습니다.
+    /// 멈춘 동안 손가락을 뗐다면(=발사하려 했다면), 풀리는 순간에 그 발사를 실행합니다.
     /// </summary>
     public void SetInputPaused(bool paused)
     {
         InputPaused = paused;
 
-        if (!paused)
+        if (!paused && shootQueued)
         {
-#if UNITY_EDITOR || UNITY_STANDALONE
-            if (!Input.GetMouseButton(0)) isDragging = false;
-#else
-            if (Input.touchCount == 0) isDragging = false;
-#endif
+            shootQueued = false;
+            if (isActiveAndEnabled) TryShoot(); // 게임오버 등으로 발사대가 꺼진 상태면 쏘지 않음
         }
     }
 
     void Update()
     {
-        if (InputPaused) return;
+        HandleInput(); // 이동은 멈춤 중에도 계속 처리
 
-        HandleInput();
+        if (InputPaused) return; // 타이머는 멈춤 중에 흐르지 않음
         HandleHoldTimer();
     }
 
@@ -290,7 +290,8 @@ public class LauncherController : MonoBehaviour
             // followSmoothness를 "초당 감쇠율"로 변환해서, 프레임레이트와 무관하게 동일한 속도로 수렴하게 함
             float clampedSmoothness = Mathf.Clamp(followSmoothness, 0.0001f, 0.9999f);
             float decayRate = -Mathf.Log(1f - clampedSmoothness) * 60f; // 기존 수치를 60fps 기준으로 보정
-            float t = 1f - Mathf.Exp(-decayRate * Time.deltaTime);
+            // unscaledDeltaTime: 스킬 연출로 게임이 잠깐 멈춰도(timeScale = 0) 발사대는 계속 따라오게 함
+            float t = 1f - Mathf.Exp(-decayRate * Time.unscaledDeltaTime);
             newPos.x = Mathf.Lerp(transform.position.x, targetX, t);
         }
 
@@ -303,6 +304,13 @@ public class LauncherController : MonoBehaviour
     /// </summary>
     private void TryShoot()
     {
+        // 잠깐 멈춤 중에는 바로 쏘지 않고, 멈춤이 풀릴 때 쏘도록 예약만 해둡니다.
+        if (InputPaused)
+        {
+            shootQueued = true;
+            return;
+        }
+
         if (!CanShoot) return;
 
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;

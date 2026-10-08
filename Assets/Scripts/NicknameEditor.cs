@@ -6,18 +6,25 @@ using TMPro;
 /// 시작 화면 안에서 바로 닉네임을 바꾸는 기능.
 /// 화면을 덮는 패널 없이, 같은 자리에서 표시 ↔ 입력이 전환됩니다.
 ///
-///   [평소]   NicknameText  +  NicknameChangeButton
-///   [편집중] NameInputField + AcceptButton
+///   [평소]   닉네임이 적힌 버튼 (NicknameChangeButton)
+///   [편집중] 입력창 (NameInputField)
 ///
-/// 편집 중에도 시작 버튼은 그대로 눌러서 게임을 시작할 수 있습니다.
-/// 입력하다가 Accept 없이 시작을 눌러도, 올바른 이름이면 자동으로 저장됩니다.
+/// 확인 버튼은 없습니다. 입력이 끝나면 자동으로 적용됩니다:
+///   - 키보드의 완료(Enter)를 누르거나
+///   - 입력창 밖의 아무 곳이나 누르거나 (시작 버튼 포함)
+///   - 휴대폰에서 키보드를 닫으면
+///
+/// 규칙
+///   - 비어 있으면 저장하지 않고 원래 이름으로 돌아갑니다.
+///   - 8글자를 넘어도 그대로 저장되고, 화면에는 앞 8글자 + "..."으로 줄여서 보여줍니다.
+///     (입력 자체는 NicknameStore.MaxLength 글자까지만 가능)
 ///
 /// 항상 켜져 있는 오브젝트(예: HeartSystem)에 붙이세요.
 /// </summary>
 public class NicknameEditor : MonoBehaviour
 {
     [Header("평소 표시")]
-    [Tooltip("현재 닉네임을 보여줄 텍스트 (NicknameText)")]
+    [Tooltip("현재 닉네임을 보여줄 텍스트 (닉네임 버튼 안의 Text)")]
     public TMP_Text currentNameText;
 
     [Tooltip("표시 형식. {0} 자리에 닉네임이 들어갑니다.")]
@@ -30,15 +37,11 @@ public class NicknameEditor : MonoBehaviour
     public GameObject[] hideWhileEditing;
 
     [Header("편집 모드")]
+    [Tooltip("닉네임 입력창. 입력이 끝나면 자동으로 적용됩니다.")]
     public TMP_InputField nicknameInputField;
 
-    [Tooltip("확인 버튼 (AcceptButton)")]
-    public Button acceptButton;
-
-    [Tooltip("입력이 잘못됐을 때 안내 문구를 띄울 텍스트 (선택)")]
-    public TMP_Text errorText;
-
     private bool isEditing;
+    private bool closeRequested;
 
     void Awake()
     {
@@ -47,15 +50,11 @@ public class NicknameEditor : MonoBehaviour
             nicknameInputField.characterLimit = NicknameStore.MaxLength;
             nicknameInputField.lineType = TMP_InputField.LineType.SingleLine;
 
-            // 키보드의 완료(Enter)를 누르면 확인 버튼과 똑같이 저장
-            nicknameInputField.onSubmit.AddListener(_ => OnAcceptPressed());
-
-            // 확인을 안 누르고 다른 곳(예: 시작 버튼)을 눌러 입력이 끝나도, 올바른 이름이면 저장
-            nicknameInputField.onEndEdit.AddListener(SaveIfValid);
+            // 입력이 끝나면(완료 키, 입력창 밖 터치, 키보드 닫기) 자동으로 적용하고 평소 표시로 돌아갑니다.
+            nicknameInputField.onEndEdit.AddListener(HandleEndEdit);
         }
 
         if (changeButton != null) changeButton.onClick.AddListener(Open);
-        if (acceptButton != null) acceptButton.onClick.AddListener(OnAcceptPressed);
 
         SetEditing(false);
     }
@@ -70,10 +69,11 @@ public class NicknameEditor : MonoBehaviour
     /// <summary>입력 모드로 전환합니다. (changeButton에 자동 연결됨)</summary>
     public void Open()
     {
+        // 입력창에는 줄이지 않은 전체 이름을 보여줍니다.
         if (nicknameInputField != null)
             nicknameInputField.text = NicknameStore.Get();
 
-        SetError("");
+        closeRequested = false;
         SetEditing(true);
 
         if (nicknameInputField != null)
@@ -83,37 +83,28 @@ public class NicknameEditor : MonoBehaviour
         }
     }
 
-    /// <summary>입력 없이 평소 표시로 돌아갑니다.</summary>
-    public void Close()
-    {
-        SetEditing(false);
-    }
-
-    private void OnAcceptPressed()
+    /// <summary>
+    /// 입력이 끝났을 때 호출됩니다. 비어 있지 않으면 저장하고, 평소 표시로 돌아갑니다.
+    /// </summary>
+    private void HandleEndEdit(string input)
     {
         if (!isEditing) return;
 
-        string input = nicknameInputField != null ? nicknameInputField.text : "";
-
-        string error = NicknameStore.Validate(input);
-        if (error != null)
-        {
-            SetError(error);
-            return;
-        }
-
+        // 비어 있으면 Save가 아무것도 하지 않아서 원래 이름이 그대로 남습니다.
         NicknameStore.Save(input);
         RefreshCurrentName();
-        SetEditing(false);
+
+        // 입력창이 자기 이벤트를 처리하는 도중에 꺼버리면 오류가 날 수 있어서,
+        // 실제로 닫는 것은 이번 프레임의 마지막(LateUpdate)으로 미룹니다.
+        closeRequested = true;
     }
 
-    private void SaveIfValid(string input)
+    void LateUpdate()
     {
-        if (!isEditing) return;
-        if (NicknameStore.Validate(input) != null) return; // 잘못된 값은 조용히 무시 (기존 이름 유지)
+        if (!closeRequested) return;
+        closeRequested = false;
 
-        NicknameStore.Save(input);
-        RefreshCurrentName();
+        if (isEditing) SetEditing(false);
     }
 
     private void SetEditing(bool editing)
@@ -128,22 +119,12 @@ public class NicknameEditor : MonoBehaviour
                 if (go != null) go.SetActive(!editing);
 
         if (nicknameInputField != null) nicknameInputField.gameObject.SetActive(editing);
-        if (acceptButton != null) acceptButton.gameObject.SetActive(editing);
-
-        if (!editing) SetError("");
     }
 
-    /// <summary>현재 닉네임 표시를 다시 그립니다.</summary>
+    /// <summary>현재 닉네임 표시를 다시 그립니다. 8글자를 넘으면 "..."으로 줄여서 보여줍니다.</summary>
     public void RefreshCurrentName()
     {
         if (currentNameText != null)
-            currentNameText.text = string.Format(currentNameFormat, NicknameStore.Get());
-    }
-
-    private void SetError(string message)
-    {
-        if (errorText == null) return;
-        errorText.text = message;
-        errorText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+            currentNameText.text = string.Format(currentNameFormat, NicknameStore.GetDisplay());
     }
 }
