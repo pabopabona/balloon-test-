@@ -1,13 +1,16 @@
 fileFormatVersion: 2
-guid: c5dc8e23fe357644c9710d5cb38056a8
+guid: 9d746b650b8ba6746b39b8b61a50ab0c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7161512143835107569
-    second: balloonLoading_02_0
+      213: -8158541860574406768
+    second: balloons_transparent_rock_0
   - first:
-      213: -8052506211310095297
-    second: balloonLoading_02_1
+      213: 3363648192695711356
+    second: balloons_transparent_rock_1
+  - first:
+      213: -8351383455425484893
+    second: balloons_transparent_rock_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,7 +52,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -101,14 +104,14 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Android
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
-    textureFormat: -1
+    textureFormat: 47
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
-    overridden: 0
+    overridden: 1
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
@@ -116,45 +119,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: balloonLoading_02_0
+      name: balloons_rock1
       rect:
         serializedVersion: 2
-        x: 138
-        y: 699
-        width: 777
-        height: 319
+        x: 18
+        y: 675
+        width: 290
+        height: 331
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f0fef0406a23d9c90800000000000000
-      internalID: -7161512143835107569
+      spriteID: 097de43576907ce80800000000000000
+      internalID: -8158541860574406768
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: balloonLoading_02_1
+      name: balloons_rock2
       rect:
         serializedVersion: 2
-        x: 152
-        y: 1014
-        width: 770
-        height: 383
+        x: 275
+        y: 259
+        width: 231
+        height: 405
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f343c3bc340cf3090800000000000000
-      internalID: -8052506211310095297
+      spriteID: c76330bb5341eae20800000000000000
+      internalID: 3363648192695711356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: balloonstring_rock1
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 411
+        width: 59
+        height: 196
+      alignment: 9
+      pivot: {x: 0.5139041, y: 0.91434276}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a72a4caefce91c80800000000000000
+      internalID: -8351383455425484893
       vertices: []
       indices: 
       edges: []
@@ -163,7 +188,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 268880432cc110c47a61fd5882d42307
     internalID: 0
     vertices: []
     indices: 
@@ -173,8 +198,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      balloonLoading_02_0: -7161512143835107569
-      balloonLoading_02_1: -8052506211310095297
+      balloons_rock1: -8158541860574406768
+      balloons_rock2: 3363648192695711356
+      balloonstring_rock1: -8351383455425484893
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

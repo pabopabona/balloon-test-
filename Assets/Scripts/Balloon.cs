@@ -29,6 +29,17 @@ public class Balloon : MonoBehaviour
     public Sprite[] stringSpritesByColor;
     public SpriteRenderer stringRenderer;
 
+    [Header("벽돌 풍선 (색이 Brick일 때만 사용)")]
+    [Tooltip("벽돌 풍선이 격자에 자리 잡는 순간 바꿔 보여줄 벽돌 모양 프리팹. " +
+             "날아가는 동안에는 Body Sprites By Color의 Brick 칸 이미지(풍선 모양)로 보이고, " +
+             "붙는 순간 풍선 이미지와 줄을 숨기고 이 프리팹을 풍선 위치에 붙입니다.")]
+    public GameObject brickAttachedPrefab;
+
+    [Tooltip("벽돌로 바뀌는 순간 한 번 나올 이펙트 (선택). 예: 먼지, 반짝임")]
+    public GameObject brickTransformEffectPrefab;
+
+    private GameObject brickVisual; // 붙은 뒤 생성된 벽돌 모양 오브젝트
+
     [Header("충돌 판정 설정")]
     [Tooltip("이 반경 안에 다른 풍선이 있으면 충돌한 것으로 간주 (보통 풍선 지름과 비슷하게)")]
     public float collisionRadius = 1.1f;
@@ -207,6 +218,37 @@ public class Balloon : MonoBehaviour
     {
         velocity = Vector2.zero;
         state = BalloonState.Attached;
+
+        // 벽돌 풍선은 자리 잡는 순간 벽돌 모양으로 바뀝니다
+        if (color == BalloonColor.Brick) TurnIntoBrick();
+    }
+
+    /// <summary>
+    /// 풍선 모양을 숨기고, 그 자리에 벽돌 모양 프리팹을 붙입니다. (이미 바뀌었으면 아무것도 안 함)
+    /// 같은 Balloon 오브젝트를 그대로 쓰기 때문에 격자 판정·회색 번개로 깨지는 처리는 그대로 동작합니다.
+    /// </summary>
+    private void TurnIntoBrick()
+    {
+        if (brickVisual != null || brickAttachedPrefab == null) return;
+
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null) spriteRenderer.enabled = false;
+        if (stringRenderer != null) stringRenderer.enabled = false;
+
+        // 풍선의 자식으로 붙여서, 풍선이 터지면(Destroy) 벽돌 모양도 같이 사라지게 합니다
+        brickVisual = Instantiate(brickAttachedPrefab, transform);
+        brickVisual.transform.localPosition = Vector3.zero;
+        brickVisual.transform.localRotation = Quaternion.identity;
+
+        if (brickTransformEffectPrefab != null)
+        {
+            // UI 파티클(UIParticle) 이펙트는 Canvas 아래에 있어야 하므로, 터짐 이펙트와 같은 방법으로 생성합니다.
+            // (UI 프리팹이면 effectCanvas 아래에, 일반 프리팹이면 월드에 생성)
+            if (HexGridManager.Instance != null)
+                HexGridManager.Instance.SpawnEffect(brickTransformEffectPrefab, transform.position);
+            else
+                Instantiate(brickTransformEffectPrefab, transform.position, Quaternion.identity);
+        }
     }
 
     private Coroutine slideCoroutine;

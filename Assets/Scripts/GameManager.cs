@@ -16,6 +16,23 @@ public class ColorUnlock
     [Tooltip("등장 확률 가중치. 값이 클수록 더 자주 나옵니다. 기본 색상은 1, " +
              "희귀하게 만들고 싶은 색은 낮게(예: 0.3) 설정하세요. 0이면 절대 안 나옵니다.")]
     public float weight = 1f;
+
+    [Tooltip("등장 레벨부터 한 레벨 오를 때마다 가중치를 얼마나 늘릴지. 0이면 항상 같은 가중치. " +
+             "예: 벽돌 0.045 → 30레벨 0.2에서 시작해 39레벨에 약 0.6")]
+    public float weightPerLevel = 0f;
+
+    [Tooltip("가중치가 늘어날 때의 최대값. 0이면 제한 없음.")]
+    public float maxWeight = 0f;
+
+    /// <summary>해당 레벨에서의 실제 가중치 (등장 전이면 0).</summary>
+    public float GetWeight(int level)
+    {
+        if (level < unlockLevel) return 0f;
+
+        float w = weight + (level - unlockLevel) * weightPerLevel;
+        if (maxWeight > 0f) w = Mathf.Min(w, maxWeight);
+        return Mathf.Max(0f, w);
+    }
 }
 
 /// <summary>
@@ -58,6 +75,36 @@ public class GameManager : MonoBehaviour
     };
 
     private int poppedSinceLevelStart = 0;
+
+    [Header("벽돌 풍선 - 레벨별 개수")]
+    [Tooltip("벽돌이 처음 나오는 레벨")]
+    public int brickUnlockLevel = 25;
+
+    [Tooltip("등장 레벨에서 한 레벨 동안 나오는 벽돌 개수 (최소~최대 사이에서 레벨마다 무작위)")]
+    public int bricksAtUnlockMin = 2;
+    public int bricksAtUnlockMax = 3;
+
+    [Tooltip("레벨이 하나 오를 때마다 늘어나는 벽돌 개수. 0.5면 2레벨마다 1개씩 늘어남")]
+    public float bricksIncreasePerLevel = 0.5f;
+
+    [Tooltip("한 레벨에 나올 수 있는 벽돌의 최대 개수")]
+    public int maxBricksPerLevel = 8;
+
+    [Tooltip("벽돌과 벽돌 사이에 최소 몇 발은 일반 풍선이 나오게 할지 (벽돌이 연달아 몰려 나오는 것 방지)")]
+    public int minShotsBetweenBricks = 4;
+
+    [Tooltip("한 발에 평균 몇 개의 풍선이 터진다고 볼지. 남은 발사 수를 추정해서 벽돌을 레벨 전체에 고르게 퍼뜨리는 데 씁니다. " +
+             "벽돌이 레벨 초반에 몰리면 값을 낮추고, 다 못 나오고 레벨이 끝나면 값을 높이세요.")]
+    public float estimatedPopsPerShot = 1.5f;
+
+    private int brickQuotaLevel = -1;   // 아래 할당량을 정한 레벨
+    private int brickQuota;             // 이번 레벨에 나올 벽돌 개수
+    private int bricksSpawnedThisLevel;
+    private int shotsSinceLastBrick = 999;
+
+    /// <summary>이번 레벨에 정해진 벽돌 개수 / 지금까지 나온 개수 (디버그·UI용)</summary>
+    public int BrickQuotaThisLevel => brickQuota;
+    public int BricksSpawnedThisLevel => bricksSpawnedThisLevel;
 
     void Awake()
     {
@@ -158,15 +205,24 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public BalloonColor GetRandomColorForLevel(int level)
     {
+        // 벽돌은 확률이 아니라 "레벨별 개수"로 따로 관리합니다
+        if (ShouldSpawnBrick(level)) return BalloonColor.Brick;
+
         List<ColorUnlock> available = new List<ColorUnlock>();
         float totalWeight = 0f;
 
+        List<float> weights = new List<float>();
+
         foreach (ColorUnlock entry in colorUnlocks)
         {
-            if (level >= entry.unlockLevel && entry.weight > 0f)
+            if (entry.color == BalloonColor.Brick) continue; // 벽돌은 위의 개수 규칙으로만 등장
+
+            float w = entry.GetWeight(level); // 레벨에 따라 늘어나는 가중치 반영
+            if (w > 0f)
             {
                 available.Add(entry);
-                totalWeight += entry.weight;
+                weights.Add(w);
+                totalWeight += w;
             }
         }
 
@@ -178,15 +234,58 @@ public class GameManager : MonoBehaviour
         float roll = Random.Range(0f, totalWeight);
         float cumulative = 0f;
 
-        foreach (ColorUnlock entry in available)
+        for (int i = 0; i < available.Count; i++)
         {
-            cumulative += entry.weight;
+            cumulative += weights[i];
             if (roll <= cumulative)
             {
-                return entry.color;
+                return available[i].color;
             }
         }
 
         return available[available.Count - 1].color; // 부동소수점 오차 대비 안전장치
+    }
+
+    // ───────────── 벽돌 개수 규칙 ─────────────
+
+    /// <summary>
+    /// 다음에 쏠 풍선을 벽돌로 할지 정합니다. (풍선을 하나 뽑을 때마다 한 번 호출됨)
+    /// - 레벨이 바뀌면 그 레벨에 나올 벽돌 개수를 새로 정합니다.
+    /// - 정한 개수를 넘지 않고, 레벨 전체에 고르게 퍼지도록 확률을 조절합니다.
+    /// </summary>
+    private bool ShouldSpawnBrick(int level)
+    {
+        if (level < brickUnlockLevel) return false;
+
+        if (level != brickQuotaLevel) RollBrickQuota(level);
+
+        shotsSinceLastBrick++;
+
+        int remaining = brickQuota - bricksSpawnedThisLevel;
+        if (remaining <= 0) return false;
+        if (shotsSinceLastBrick <= Mathf.Max(0, minShotsBetweenBricks)) return false;
+
+        // 이번 레벨이 끝날 때까지 남은 발사 수를 대략 추정해서, 남은 벽돌을 그 안에 고르게 배치
+        int remainingPops = Mathf.Max(1, GetThresholdForLevel(level) - poppedSinceLevelStart);
+        float estimatedShotsLeft = Mathf.Max(1f, remainingPops / Mathf.Max(0.1f, estimatedPopsPerShot));
+        float chance = Mathf.Clamp01(remaining / estimatedShotsLeft);
+
+        if (Random.value >= chance) return false;
+
+        bricksSpawnedThisLevel++;
+        shotsSinceLastBrick = 0;
+        return true;
+    }
+
+    private void RollBrickQuota(int level)
+    {
+        brickQuotaLevel = level;
+        bricksSpawnedThisLevel = 0;
+
+        int baseCount = Random.Range(bricksAtUnlockMin, Mathf.Max(bricksAtUnlockMin, bricksAtUnlockMax) + 1);
+        int extra = Mathf.FloorToInt((level - brickUnlockLevel) * Mathf.Max(0f, bricksIncreasePerLevel));
+        brickQuota = Mathf.Clamp(baseCount + extra, 0, Mathf.Max(0, maxBricksPerLevel));
+
+        Debug.Log($"[Brick] 레벨 {level}: 이번 레벨 벽돌 {brickQuota}개");
     }
 }

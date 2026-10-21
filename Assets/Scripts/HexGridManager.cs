@@ -23,8 +23,17 @@ public class HexGridManager : MonoBehaviour
     [Header("매칭 설정")]
     public int minMatchCount = 3;
 
+    [Tooltip("회색 매칭 때 한 번에 터질 수 있는 최대 줄 수. 0이면 제한 없음 " +
+             "(회색 풍선이 걸쳐 있는 줄 수만큼 터짐: 3개 매칭이면 1~3줄).")]
+    public int grayMaxClearRows = 0;
+
     [Header("터짐 이펙트")]
     public GameObject[] popEffectPrefabsByColor;
+
+    [Tooltip("레인보우 폭발에 휩쓸려 터진 주변 풍선 전용 이펙트 (색 순서는 위와 같음). " +
+             "칸을 채운 색만 이 이펙트로 바뀌고, 비워둔 색은 위의 일반 터짐 이펙트를 그대로 씁니다. " +
+             "예: Element 6(Gray)에 넣으면 레인보우에 휩쓸린 전기 풍선만 따로 연출, Element 7(Brick)은 깨지는 벽돌용.")]
+    public GameObject[] rainbowSplashEffectPrefabsByColor;
     public Canvas effectCanvas;
 
     [Header("게임오버 - 위험선")]
@@ -41,6 +50,9 @@ public class HexGridManager : MonoBehaviour
     public System.Action<BalloonColor, int> OnMatchPopped;
 
     public System.Action OnBalloonAttached;
+
+    /// <summary>풍선이 격자에 붙을 때, 붙은 풍선의 색과 함께 알려줍니다 (벽돌 전용 소리 등에 사용).</summary>
+    public System.Action<BalloonColor> OnBalloonAttachedColor;
 
     /// <summary>
     /// 이번 발사로 인한 배치+매칭+연쇄 반응이 "완전히 다" 끝났을 때 호출됩니다.
@@ -288,6 +300,7 @@ public class HexGridManager : MonoBehaviour
         balloon.gridCell = cell;
 
         OnBalloonAttached?.Invoke();
+        OnBalloonAttachedColor?.Invoke(balloon.color);
 
         comboDepth = 0;
 
@@ -332,6 +345,10 @@ public class HexGridManager : MonoBehaviour
         if (!grid.TryGetValue(startCell, out Balloon startBalloon)) return poppedCells;
 
         BalloonColor targetColor = startBalloon.color;
+
+        // 벽돌은 같은 벽돌끼리 붙어도 매칭되지 않습니다 (회색 계열로만 깨짐)
+        if (BalloonColorUtil.IsUnmatchable(targetColor)) return poppedCells;
+
         HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
         List<Vector2Int> group = new List<Vector2Int>();
         Queue<Vector2Int> queue = new Queue<Vector2Int>();
@@ -358,8 +375,8 @@ public class HexGridManager : MonoBehaviour
         if (group.Count >= minMatchCount)
         {
             // 색깔에 따라 실제로 터질 칸 목록이 달라집니다.
-            // - Rainbow: 매칭된 그룹 + 그 주변에 붙어있는 모든 풍선(색깔 무관)까지 같이 터짐
-            // - Gray: 매칭이 시작된 줄(row) 전체가 색깔 무관하게 다 터짐
+            // - Rainbow: 매칭된 그룹 + 그 주변에 붙어있는 모든 풍선(색깔 무관, 벽돌 포함)까지 같이 터짐
+            // - Gray: 매칭된 회색 풍선이 걸쳐 있는 모든 줄(row)이 색깔 무관하게 다 터짐 (벽돌 포함 → 벽돌을 깨는 방법)
             // - 그 외: 기존처럼 매칭된 그룹만 터짐
             List<Vector2Int> cellsToPop;
 
@@ -369,15 +386,18 @@ public class HexGridManager : MonoBehaviour
             }
             else if (targetColor == BalloonColor.Gray)
             {
-                // 매칭된 그룹은 여러 행(row)에 걸쳐 있을 수 있으므로(벌집 격자 특성상
-                // 화면에 세로로 붙어 보여도 내부적으로는 다른 행일 수 있음), 그룹의
-                // "평균 행"을 중심으로 잡아 그 행 전체를 지웁니다. 다만 다른 행에 있는
-                // 매칭된 회색 풍선까지 놓치지 않도록, 원래 매칭된 그룹도 반드시 같이 포함시킵니다.
-                int centerRow = GetAverageRow(group);
+                // 매칭된 회색 풍선이 걸쳐 있는 "모든 줄"을 가로로 전부 터뜨립니다.
+                //   가로로 3개 (한 줄)            → 1줄
+                //   가로 2개 + 세로 1개 (두 줄)    → 2줄
+                //   세로로 3개 (세 줄)            → 3줄
+                // 4개 이상 매칭돼 더 많은 줄에 걸치면 그만큼 터집니다 (grayMaxClearRows로 제한 가능).
                 HashSet<Vector2Int> combined = new HashSet<Vector2Int>(group);
-                foreach (Vector2Int cell in GetEntireRow(centerRow))
+                foreach (int row in GetGrayClearRows(group, startCell.x))
                 {
-                    combined.Add(cell);
+                    foreach (Vector2Int cell in GetEntireRow(row))
+                    {
+                        combined.Add(cell);
+                    }
                 }
                 cellsToPop = new List<Vector2Int>(combined);
             }
@@ -386,12 +406,25 @@ public class HexGridManager : MonoBehaviour
                 cellsToPop = group;
             }
 
+            // 레인보우 폭발에서 "매칭 그룹이 아닌" 주변 풍선 = 폭발에 휩쓸린 풍선
+            HashSet<Vector2Int> matchedGroup = targetColor == BalloonColor.Rainbow
+                ? new HashSet<Vector2Int>(group)
+                : null;
+
             foreach (Vector2Int cell in cellsToPop)
             {
                 if (grid.TryGetValue(cell, out Balloon b))
                 {
                     grid.Remove(cell);
-                    SpawnPopEffect(b.transform.position, b.color);
+
+                    bool isRainbowSplash = matchedGroup != null && !matchedGroup.Contains(cell);
+                    GameObject splashPrefab = isRainbowSplash ? GetRainbowSplashEffect(b.color) : null;
+
+                    if (splashPrefab != null)
+                        SpawnEffect(splashPrefab, b.transform.position);   // 레인보우에 휩쓸린 전용 이펙트
+                    else
+                        SpawnPopEffect(b.transform.position, b.color);     // 일반 터짐 이펙트
+
                     Destroy(b.gameObject);
                     poppedCells.Add(cell);
                 }
@@ -418,6 +451,7 @@ public class HexGridManager : MonoBehaviour
         {
             foreach (Vector2Int neighbor in GetNeighborCoords(cell))
             {
+                // 레인보우 폭발은 주변의 모든 풍선을 터뜨립니다 (벽돌 포함)
                 if (grid.ContainsKey(neighbor))
                 {
                     result.Add(neighbor);
@@ -447,6 +481,27 @@ public class HexGridManager : MonoBehaviour
         }
 
         return Mathf.RoundToInt(sum / cells.Count);
+    }
+
+    /// <summary>
+    /// 회색 매칭 그룹이 걸쳐 있는 줄(row) 목록을 돌려줍니다.
+    /// grayMaxClearRows가 0보다 크면, 방금 붙은 풍선의 줄(originRow)에서 가까운 줄부터 그 개수만큼만 고릅니다.
+    /// </summary>
+    private List<int> GetGrayClearRows(List<Vector2Int> group, int originRow)
+    {
+        List<int> rows = new List<int>();
+        foreach (Vector2Int cell in group)
+        {
+            if (!rows.Contains(cell.x)) rows.Add(cell.x);
+        }
+
+        if (grayMaxClearRows > 0 && rows.Count > grayMaxClearRows)
+        {
+            rows.Sort((a, b) => Mathf.Abs(a - originRow).CompareTo(Mathf.Abs(b - originRow)));
+            rows.RemoveRange(grayMaxClearRows, rows.Count - grayMaxClearRows);
+        }
+
+        return rows;
     }
 
     private List<Vector2Int> GetEntireRow(int row)
@@ -593,6 +648,9 @@ public class HexGridManager : MonoBehaviour
             {
                 if (!grid.TryGetValue(neighborCell, out Balloon neighborBalloon)) continue;
 
+                // 벽돌은 밀려나지 않고 벽처럼 그 자리에 버팁니다 (반동 연출도 없음)
+                if (BalloonColorUtil.IsImmovable(neighborBalloon.color)) continue;
+
                 Vector2Int farCell = GetOppositeCell(poppedCell, neighborCell);
 
                 bool outOfBounds = farCell.x < 0 || farCell.x >= maxRows
@@ -620,6 +678,17 @@ public class HexGridManager : MonoBehaviour
         }
 
         return movedFarCells;
+    }
+
+    /// <summary>레인보우 폭발에 휩쓸린 풍선 전용 이펙트. 해당 색 칸이 비어 있으면 null.</summary>
+    private GameObject GetRainbowSplashEffect(BalloonColor color)
+    {
+        if (rainbowSplashEffectPrefabsByColor == null) return null;
+
+        int idx = (int)color;
+        if (idx < 0 || idx >= rainbowSplashEffectPrefabsByColor.Length) return null;
+
+        return rainbowSplashEffectPrefabsByColor[idx];
     }
 
     private void SpawnPopEffect(Vector3 worldPosition, BalloonColor color)

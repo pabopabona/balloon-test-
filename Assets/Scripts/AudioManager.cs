@@ -40,6 +40,13 @@ public class AudioManager : MonoBehaviour
     [Tooltip("회색 풍선 매칭(가로 한 줄 터짐) 시 재생할 전기 효과음. 비워두면 일반 터짐 소리가 납니다.")]
     public AudioClip grayElectricClip;
 
+    [Tooltip("벽돌 풍선이 격자에 붙을 때 재생할 소리 (예: 쿵, 돌 부딪히는 소리). 비워두면 일반 부착 소리가 납니다.")]
+    public AudioClip brickAttachClip;
+
+    [Range(0f, 1f)]
+    [Tooltip("벽돌 부착 소리만 따로 볼륨 조절 (1 = 효과음 볼륨과 동일)")]
+    public float brickAttachVolumeScale = 1f;
+
     [Tooltip("체크하면 회색 매칭 때 전기 소리 + 일반 터짐 소리를 같이 냅니다. " +
              "끄면 전기 소리만 납니다.")]
     public bool playPopWithElectric = false;
@@ -105,7 +112,7 @@ public class AudioManager : MonoBehaviour
 
         if (gridManager != null)
         {
-            gridManager.OnBalloonAttached += HandleAttached;
+            gridManager.OnBalloonAttachedColor += HandleAttached;
             gridManager.OnMatchPopped += HandleMatchPopped;
             gridManager.OnComboStep += HandleCombo;
         }
@@ -121,7 +128,7 @@ public class AudioManager : MonoBehaviour
 
         if (gridManager != null)
         {
-            gridManager.OnBalloonAttached -= HandleAttached;
+            gridManager.OnBalloonAttachedColor -= HandleAttached;
             gridManager.OnMatchPopped -= HandleMatchPopped;
             gridManager.OnComboStep -= HandleCombo;
         }
@@ -131,7 +138,14 @@ public class AudioManager : MonoBehaviour
     }
 
     private void HandleShoot(Vector3 spawnPos, Vector2 velocity) => PlayClip(shootClip);
-    private void HandleAttached() => PlayClip(attachClip);
+    private void HandleAttached(BalloonColor color)
+    {
+        // 벽돌은 전용 소리가 있으면 그 소리로, 없으면 일반 부착 소리로
+        if (color == BalloonColor.Brick && brickAttachClip != null)
+            PlayClip(brickAttachClip, 1f, sfxVolume * brickAttachVolumeScale);
+        else
+            PlayClip(attachClip);
+    }
     /// <summary>
     /// 매칭으로 풍선이 터졌을 때 호출됩니다. 회색 매칭이면 전기 효과음, 그 외에는 일반 터짐 소리.
     /// </summary>

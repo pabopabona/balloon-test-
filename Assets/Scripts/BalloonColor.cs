@@ -12,7 +12,8 @@ public enum BalloonColor
     Yellow,
     Purple,
     Rainbow,
-    Gray
+    Gray,
+    Brick   // 벽돌: 매칭되지 않고, 회색(번개)과 레인보우 폭발로만 깨짐. 반드시 맨 뒤에 두세요(기존 값이 밀리지 않도록).
 }
 
 /// <summary>
@@ -21,6 +22,12 @@ public enum BalloonColor
 /// </summary>
 public static class BalloonColorUtil
 {
+    /// <summary>매칭(같은 색 3개)이 되지 않는 풍선인지. 지금은 벽돌만 해당합니다.</summary>
+    public static bool IsUnmatchable(BalloonColor color) => color == BalloonColor.Brick;
+
+    /// <summary>밀려나지 않는 풍선인지. 지금은 벽돌만 해당합니다.</summary>
+    public static bool IsImmovable(BalloonColor color) => color == BalloonColor.Brick;
+
     public static Color ToColor(BalloonColor color)
     {
         switch (color)
@@ -32,6 +39,7 @@ public static class BalloonColorUtil
             case BalloonColor.Purple: return new Color(0.65f, 0.35f, 0.85f);
             case BalloonColor.Rainbow: return new Color(1.00f, 0.45f, 0.75f); // 실제 무지개 이미지 연결 전까지의 임시 색
             case BalloonColor.Gray: return new Color(0.60f, 0.60f, 0.60f);
+            case BalloonColor.Brick: return new Color(0.62f, 0.33f, 0.22f); // 실제 벽돌 이미지 연결 전까지의 임시 색
             default: return Color.white;
         }
     }
@@ -42,7 +50,13 @@ public static class BalloonColorUtil
     /// </summary>
     public static BalloonColor GetRandom()
     {
+        // 안전장치용이므로 벽돌은 제외합니다(벽돌은 레벨 규칙으로만 등장).
         System.Array values = System.Enum.GetValues(typeof(BalloonColor));
-        return (BalloonColor)values.GetValue(Random.Range(0, values.Length));
+        BalloonColor picked;
+        do
+        {
+            picked = (BalloonColor)values.GetValue(Random.Range(0, values.Length));
+        } while (picked == BalloonColor.Brick);
+        return picked;
     }
 }

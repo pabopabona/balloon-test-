@@ -43,8 +43,19 @@ public class LauncherController : MonoBehaviour
              "풍선 색 등장 등 다른 레벨 규칙에는 영향을 주지 않습니다.")]
     public int holdLevelOffset = 0;
 
-    /// <summary>홀드 타이머 계산에 실제로 쓰이는 레벨 (현재 레벨 - 완화 값, 최소 1).</summary>
-    public int EffectiveHoldLevel => Mathf.Max(1, currentLevel - holdLevelOffset);
+    [Tooltip("완화 하한선. 타이머 기준 레벨이 '현재 레벨 × 이 값' 아래로는 내려가지 않습니다. " +
+             "예: 0.6이면 레벨 32에서는 아무리 레인보우 스킬이 쌓여도 기준 레벨 19까지만 내려갑니다. " +
+             "1이면 완화가 전혀 없고, 0.1에 가까울수록 예전처럼 끝없이 쌓입니다.")]
+    [Range(0.1f, 1f)] public float minHoldLevelRatio = 0.6f;
+
+    /// <summary>완화 하한선에 해당하는 레벨 (현재 레벨 × minHoldLevelRatio, 올림).</summary>
+    public int MinHoldLevel => Mathf.Max(1, Mathf.CeilToInt(currentLevel * minHoldLevelRatio));
+
+    /// <summary>
+    /// 홀드 타이머 계산에 실제로 쓰이는 레벨 (현재 레벨 - 완화 값).
+    /// 단, 완화 하한선(MinHoldLevel) 아래로는 내려가지 않습니다. 하한선은 레벨이 오를수록 같이 올라갑니다.
+    /// </summary>
+    public int EffectiveHoldLevel => Mathf.Max(MinHoldLevel, currentLevel - holdLevelOffset);
 
     /// <summary>
     /// 홀드 타이머를 느리게 되돌립니다. ratio가 0.5면 "타이머 기준 레벨"을 절반으로 낮춥니다.
@@ -53,7 +64,8 @@ public class LauncherController : MonoBehaviour
     /// </summary>
     public void ApplyHoldTimerRelief(float ratio = 0.5f)
     {
-        int newEffective = Mathf.Max(1, Mathf.RoundToInt(EffectiveHoldLevel * Mathf.Clamp01(ratio)));
+        int newEffective = Mathf.RoundToInt(EffectiveHoldLevel * Mathf.Clamp01(ratio));
+        newEffective = Mathf.Max(MinHoldLevel, newEffective); // 완화 하한선 아래로는 내리지 않음
         holdLevelOffset = currentLevel - newEffective;
 
         holdTimer = 0f;

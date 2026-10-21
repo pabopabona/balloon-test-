@@ -117,6 +117,7 @@ MonoBehaviour:
   - {fileID: 846840064380682077, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   - {fileID: -98998826056347849, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   - {fileID: -7273471537184293426, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
+  - {fileID: -8158541860574406768, guid: 9d746b650b8ba6746b39b8b61a50ab0c, type: 3}
   stringSpritesByColor:
   - {fileID: 3964081252117180994, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   - {fileID: 8957283353454636840, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
@@ -125,7 +126,10 @@ MonoBehaviour:
   - {fileID: -5991824403848345347, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   - {fileID: -6871444062443345112, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
   - {fileID: 7572218023283381857, guid: 91ef4162f87c89347b4c1b7d4b25af93, type: 3}
+  - {fileID: -8351383455425484893, guid: 9d746b650b8ba6746b39b8b61a50ab0c, type: 3}
   stringRenderer: {fileID: 855907305044721013}
+  brickAttachedPrefab: {fileID: 465572369625542982, guid: bd35ea7f91d248d488fa16cd04d333a4, type: 3}
+  brickTransformEffectPrefab: {fileID: 2199884747398262543, guid: 5eeacc03971d07e4d9c992d6c2f193e7, type: 3}
   collisionRadius: 1.2
   ceilingY: 8.9
   maxStepDistance: 0.1
