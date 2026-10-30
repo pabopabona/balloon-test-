@@ -55,6 +55,12 @@ public class HexGridManager : MonoBehaviour
     public System.Action<BalloonColor> OnBalloonAttachedColor;
 
     /// <summary>
+    /// 매칭(레인보우 폭발, 회색 3개 매칭)으로 벽돌이 깨졌을 때 호출됩니다. (깨진 벽돌 수, 어떤 색 매칭이었는지)
+    /// 회색 스킬(화면 정리)로 깨진 벽돌은 여기에 포함되지 않습니다.
+    /// </summary>
+    public System.Action<int, BalloonColor> OnBricksBroken;
+
+    /// <summary>
     /// 이번 발사로 인한 배치+매칭+연쇄 반응이 "완전히 다" 끝났을 때 호출됩니다.
     /// (매칭이 없었으면 배치 직후 바로, 있었으면 모든 연쇄가 끝난 뒤에)
     /// BalloonSpawner가 이걸 기준으로 다음 발사를 허용합니다.
@@ -407,6 +413,8 @@ public class HexGridManager : MonoBehaviour
             }
 
             // 레인보우 폭발에서 "매칭 그룹이 아닌" 주변 풍선 = 폭발에 휩쓸린 풍선
+            int bricksBroken = 0;
+
             HashSet<Vector2Int> matchedGroup = targetColor == BalloonColor.Rainbow
                 ? new HashSet<Vector2Int>(group)
                 : null;
@@ -425,10 +433,14 @@ public class HexGridManager : MonoBehaviour
                     else
                         SpawnPopEffect(b.transform.position, b.color);     // 일반 터짐 이펙트
 
+                    if (b.color == BalloonColor.Brick) bricksBroken++;
+
                     Destroy(b.gameObject);
                     poppedCells.Add(cell);
                 }
             }
+
+            if (bricksBroken > 0) OnBricksBroken?.Invoke(bricksBroken, targetColor);
 
             comboDepth++;
             OnBalloonsPopped?.Invoke(poppedCells.Count);

@@ -47,6 +47,19 @@ public class AudioManager : MonoBehaviour
     [Tooltip("벽돌 부착 소리만 따로 볼륨 조절 (1 = 효과음 볼륨과 동일)")]
     public float brickAttachVolumeScale = 1f;
 
+    [Tooltip("벽돌이 깨질 때 재생할 소리 (예: 와장창). 매칭 소리와 함께 한 번 납니다. 비워두면 소리 없음.")]
+    public AudioClip brickBreakClip;
+
+    [Range(0f, 1f)]
+    [Tooltip("벽돌 깨지는 소리만 따로 볼륨 조절 (1 = 효과음 볼륨과 동일)")]
+    public float brickBreakVolumeScale = 1f;
+
+    [Tooltip("레인보우 폭발로 벽돌이 깨질 때 소리를 낼지")]
+    public bool brickBreakOnRainbow = true;
+
+    [Tooltip("회색 3개 매칭(가로 줄)으로 벽돌이 깨질 때 소리를 낼지")]
+    public bool brickBreakOnGray = true;
+
     [Tooltip("체크하면 회색 매칭 때 전기 소리 + 일반 터짐 소리를 같이 냅니다. " +
              "끄면 전기 소리만 납니다.")]
     public bool playPopWithElectric = false;
@@ -113,6 +126,7 @@ public class AudioManager : MonoBehaviour
         if (gridManager != null)
         {
             gridManager.OnBalloonAttachedColor += HandleAttached;
+            gridManager.OnBricksBroken += HandleBricksBroken;
             gridManager.OnMatchPopped += HandleMatchPopped;
             gridManager.OnComboStep += HandleCombo;
         }
@@ -129,6 +143,7 @@ public class AudioManager : MonoBehaviour
         if (gridManager != null)
         {
             gridManager.OnBalloonAttachedColor -= HandleAttached;
+            gridManager.OnBricksBroken -= HandleBricksBroken;
             gridManager.OnMatchPopped -= HandleMatchPopped;
             gridManager.OnComboStep -= HandleCombo;
         }
@@ -138,6 +153,19 @@ public class AudioManager : MonoBehaviour
     }
 
     private void HandleShoot(Vector3 spawnPos, Vector2 velocity) => PlayClip(shootClip);
+    /// <summary>
+    /// 매칭으로 벽돌이 깨졌을 때. 여러 개가 한꺼번에 깨져도 소리는 한 번만 냅니다.
+    /// (회색 스킬의 화면 정리는 스킬 발동 소리만 나고, 여기로 오지 않습니다)
+    /// </summary>
+    private void HandleBricksBroken(int count, BalloonColor byColor)
+    {
+        if (brickBreakClip == null || count <= 0) return;
+        if (byColor == BalloonColor.Rainbow && !brickBreakOnRainbow) return;
+        if (byColor == BalloonColor.Gray && !brickBreakOnGray) return;
+
+        PlayClip(brickBreakClip, 1f, sfxVolume * brickBreakVolumeScale);
+    }
+
     private void HandleAttached(BalloonColor color)
     {
         // 벽돌은 전용 소리가 있으면 그 소리로, 없으면 일반 부착 소리로
