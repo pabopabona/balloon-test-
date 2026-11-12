@@ -52,7 +52,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -119,15 +119,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: theme_frontground_0
+      name: theme_frontground
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 433
-        height: 252
+        y: 2
+        width: 1024
+        height: 298
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -141,45 +141,23 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: theme_frontground_1
+      name: theme_frontground_duck
       rect:
         serializedVersion: 2
-        x: 423
-        y: 39
-        width: 12
-        height: 12
+        x: 65
+        y: 403
+        width: 835
+        height: 579
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: ccf44844ff86741e0800000000000000
-      internalID: -2213685246253838388
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: theme_frontground_2
-      rect:
-        serializedVersion: 2
-        x: 573
-        y: 0
-        width: 507
-        height: 203
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9de8ca574c59139d0800000000000000
-      internalID: -2796289222599995687
+      spriteID: 0be27d43abc731840ae525dc641d2b65
+      internalID: -1342981956
       vertices: []
       indices: 
       edges: []
@@ -198,9 +176,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      theme_frontground_0: 4551476299031859433
+      theme_frontground: 4551476299031859433
       theme_frontground_1: -2213685246253838388
       theme_frontground_2: -2796289222599995687
+      theme_frontground_duck: -1342981956
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

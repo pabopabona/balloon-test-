@@ -51,8 +51,29 @@ public class GameManager : MonoBehaviour
     public int incrementPerLevel = 2;
 
     public System.Action<int> OnLevelUp;
+
+    /// <summary>
+    /// "진짜" 게임오버 때 호출됩니다. (이어하기를 하지 않기로 했거나, 이어하기를 할 수 없을 때)
+    /// 게임오버 화면, 등급 문구, 리더보드 제출 등은 모두 이 이벤트를 기준으로 동작합니다.
+    /// </summary>
     public System.Action<string> OnGameOver;
+
+    /// <summary>
+    /// 게임이 멈춘 상태인지. 이어하기 선택을 기다리는 동안에도 true입니다. (풍선/타이머/스킬 정지용)
+    /// </summary>
     public bool IsGameOver { get; private set; } = false;
+
+    [Header("이어하기 (광고 보고 이어하기)")]
+    [Tooltip("연결하면 게임오버 때 바로 끝내지 않고 \"광고 보고 이어하기\"를 먼저 물어봅니다. 비워두면 예전처럼 바로 게임오버.")]
+    public ReviveManager reviveManager;
+
+    /// <summary>이어하기 선택을 기다리는 중인지.</summary>
+    public bool IsWaitingForRevive { get; private set; }
+
+    /// <summary>이번 판에서 이어하기를 한 횟수.</summary>
+    public int ReviveCount { get; private set; }
+
+    private string pendingGameOverReason;
 
     [Header("점수 설정")]
     public int pointsPerBalloon = 10;
@@ -148,7 +169,36 @@ public class GameManager : MonoBehaviour
         if (launcher != null)
             launcher.enabled = false;
 
+        // 이어하기를 물어볼 수 있으면, 진짜 게임오버(OnGameOver)는 선택이 끝날 때까지 미룹니다.
+        if (reviveManager != null && reviveManager.TryOffer(this))
+        {
+            IsWaitingForRevive = true;
+            pendingGameOverReason = reason;
+            return;
+        }
+
         OnGameOver?.Invoke(reason);
+    }
+
+    /// <summary>이어하기를 하지 않기로 했을 때(포기, 시간 초과, 광고 실패) ReviveManager가 호출합니다.</summary>
+    public void ConfirmGameOver()
+    {
+        if (!IsWaitingForRevive) return;
+        IsWaitingForRevive = false;
+
+        OnGameOver?.Invoke(pendingGameOverReason);
+    }
+
+    /// <summary>
+    /// 광고를 끝까지 봤을 때 ReviveManager가 호출합니다. 레벨, 점수, 진행도는 그대로 유지됩니다.
+    /// 발사대는 화면 정리가 끝난 뒤 ReviveManager가 다시 켭니다.
+    /// </summary>
+    public void Revive()
+    {
+        if (!IsWaitingForRevive) return;
+        IsWaitingForRevive = false;
+        IsGameOver = false;
+        ReviveCount++;
     }
 
     private void HandleBalloonsPopped(int count)

@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
@@ -25,16 +27,25 @@ public class GameOverRating : MonoBehaviour
 
         [Tooltip("문구 색")]
         public Color color = Color.white;
+
+        [Tooltip("이 등급일 때 보여줄 캐릭터 이미지 (예: 다람쥐). 비워두면 캐릭터를 숨깁니다.")]
+        public Sprite characterSprite;
     }
 
     [Header("참조")]
     public GameManager gameManager;
     public LauncherController launcher;
 
+    [Tooltip("연결하면 GameOverUI가 게임오버 화면을 늦게 띄울 때, 화면이 뜨는 순간에 맞춰 문구와 폭죽을 보여줍니다.")]
+    public GameOverUI gameOverUI;
+
     [Header("UI (필요한 것만 연결)")]
     [Tooltip("배경 이미지를 포함한 묶음 오브젝트 (선택). 넣으면 텍스트와 함께 켜지고 꺼집니다. " +
              "배경 이미지 위에 아래 텍스트들을 자식으로 올려두세요.")]
     public GameObject ratingRoot;
+
+    [Tooltip("등급별 캐릭터를 보여줄 Image (선택). 배경 위에 얹어두세요.")]
+    public Image characterImage;
 
     [Tooltip("도달 레벨. 예: \"Lv. 17\"")]
     public TMP_Text levelText;
@@ -60,6 +71,27 @@ public class GameOverRating : MonoBehaviour
 
     public string newBestMessage = "새 기록!";
 
+    [Header("기록 갱신 축하 (폭죽)")]
+    [Tooltip("최고 기록을 갱신했을 때 띄울 이펙트(파티클) 프리팹. 재생 후 스스로 사라지게 " +
+             "ParticleGroupAutoDestroy를 붙여두세요.")]
+    public GameObject celebrationEffectPrefab;
+
+    [Tooltip("폭죽을 생성할 부모(UI 위치). 비워두면 Rating Root(배경 묶음) 아래에 생성됩니다. " +
+             "UI 파티클은 Canvas 아래에 있어야 보이므로 GameOverPanel 안의 오브젝트를 넣으세요.")]
+    public Transform celebrationParent;
+
+    [Tooltip("게임오버 화면이 뜬 뒤 폭죽이 터지기까지 기다리는 시간(초)")]
+    public float celebrationDelay = 0.3f;
+
+    [Tooltip("폭죽과 함께 재생할 효과음 (선택)")]
+    public AudioClip celebrationClip;
+
+    [Tooltip("체크하면 첫 판(이전 기록이 없을 때)에도 폭죽을 터뜨립니다.")]
+    public bool celebrateFirstGame = false;
+
+    [Tooltip("체크하면 기록 갱신이 아니어도 최고 등급에 도달하면 폭죽을 터뜨립니다.")]
+    public bool celebrateOnTopTier = false;
+
     [Header("최고 등급일 때 표시")]
     [Tooltip("체크하면 최고 등급일 때 Rating Text를 숨기고 Next Goal Text만 보여줍니다.")]
     public bool hideRatingOnTopTier = true;
@@ -84,15 +116,26 @@ public class GameOverRating : MonoBehaviour
     void OnEnable()
     {
         if (gameManager != null) gameManager.OnGameOver += HandleGameOver;
+        if (gameOverUI != null) gameOverUI.OnPanelShown += HandlePanelShown;
         SetVisible(false);
     }
 
     void OnDisable()
     {
         if (gameManager != null) gameManager.OnGameOver -= HandleGameOver;
+        if (gameOverUI != null) gameOverUI.OnPanelShown -= HandlePanelShown;
     }
 
     private void HandleGameOver(string reason)
+    {
+        // GameOverUI를 연결했다면 패널이 실제로 뜰 때(HandlePanelShown) 표시합니다.
+        if (gameOverUI != null) return;
+        ShowCurrentLevel();
+    }
+
+    private void HandlePanelShown() => ShowCurrentLevel();
+
+    private void ShowCurrentLevel()
     {
         int level = launcher != null ? launcher.currentLevel : 1;
         Show(level);
@@ -124,6 +167,12 @@ public class GameOverRating : MonoBehaviour
             ratingText.color = tier.color;
         }
 
+        if (characterImage != null)
+        {
+            characterImage.sprite = tier.characterSprite;
+            characterImage.preserveAspect = true;
+        }
+
         bool isTopTier = tierIndex >= tiers.Count - 1;
         if (nextGoalText != null)
             nextGoalText.text = topTierGoalMessage;
@@ -150,6 +199,36 @@ public class GameOverRating : MonoBehaviour
 
         if (bestText != null)
             bestText.gameObject.SetActive(!isTopTier || showBestOnTopTier);
+
+        // 기록 갱신(또는 설정에 따라 최고 등급 도달) 시 축하 폭죽
+        bool recordBroken = isNewBest && (previousBest > 0 || celebrateFirstGame);
+        if (recordBroken || (celebrateOnTopTier && isTopTier))
+            StartCoroutine(CelebrateRoutine());
+
+        // 이 등급에 캐릭터 이미지가 없으면(예: "좀 더 노력해봐") 캐릭터를 숨김
+        if (characterImage != null)
+            characterImage.gameObject.SetActive(tier.characterSprite != null);
+    }
+
+    private IEnumerator CelebrateRoutine()
+    {
+        // 게임오버 직후 화면이 멈춰 있어도 흐르도록 실제 시간으로 기다림
+        if (celebrationDelay > 0f) yield return new WaitForSecondsRealtime(celebrationDelay);
+
+        if (celebrationEffectPrefab != null)
+        {
+            Transform parent = celebrationParent != null
+                ? celebrationParent
+                : (ratingRoot != null ? ratingRoot.transform : null);
+
+            if (parent != null)
+                Instantiate(celebrationEffectPrefab, parent, false);
+            else
+                Debug.LogWarning("[GameOverRating] 폭죽을 생성할 부모가 없습니다. Celebration Parent를 연결하세요.");
+        }
+
+        if (celebrationClip != null && AudioManager.Instance != null)
+            AudioManager.Instance.PlayClip(celebrationClip);
     }
 
     private int GetTierIndex(int level)
@@ -164,6 +243,7 @@ public class GameOverRating : MonoBehaviour
     private void SetVisible(bool visible)
     {
         if (ratingRoot != null) ratingRoot.SetActive(visible);
+        if (characterImage != null) characterImage.gameObject.SetActive(visible);
 
         if (levelText != null) levelText.gameObject.SetActive(visible);
         if (ratingText != null) ratingText.gameObject.SetActive(visible);
