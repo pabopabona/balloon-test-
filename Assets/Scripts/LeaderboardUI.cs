@@ -60,6 +60,10 @@ public class LeaderboardUI : MonoBehaviour
     [Tooltip("내가 목록 밖(예: 20위)일 때 내 줄을 생성할 부모. Scroll View 바로 아래에 둔 빈 오브젝트를 넣으세요.")]
     public RectTransform selfRowOutsideParent;
 
+    [Tooltip("체크하면 내 순위가 목록 안에 있을 때 Self Row Outside Parent(아래 자리)를 숨깁니다. " +
+             "LeaderboardPanel에 Vertical Layout Group을 쓰면 그만큼 스크롤 목록이 늘어나 빈 공간이 생기지 않습니다.")]
+    public bool hideSlotWhenInList = true;
+
     public string emptySlotText = "-";
 
     [Header("띄우는 타이밍")]
@@ -254,6 +258,11 @@ public class LeaderboardUI : MonoBehaviour
                 if (showOutside) selfRowOutside.text = FormatEntry(myEntry);
                 GetOutsideRoot().gameObject.SetActive(showOutside);
             }
+
+            // 내 줄이 목록 안에 있으면 아래 자리(슬롯) 자체를 숨깁니다.
+            // LeaderboardPanel에 Vertical Layout Group을 쓰면, 비워진 만큼 스크롤 목록이 자동으로 늘어납니다.
+            if (hideSlotWhenInList)
+                selfRowOutsideParent.gameObject.SetActive(showOutside);
         }
     }
 
