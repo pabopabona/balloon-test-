@@ -13,6 +13,9 @@ using GoogleMobileAds.Api;
 ///   3) 끝까지 시청하면 onRewarded, 중간에 닫거나 실패하면 onClosedWithoutReward
 ///   4) 광고가 닫히면 다음 광고를 바로 다시 로드 (다음 버튼 클릭 때 기다리지 않도록)
 ///
+/// [1.1] 미리 받아둔 광고는 static으로 보관합니다. 다시시작(씬 다시 불러오기)을 해도
+///       버리지 않고 그대로 재사용하므로, 쓰지 않을 광고를 반복해서 요청하지 않습니다.
+///
 /// 광고 단위 ID 기본값은 구글 공식 "테스트 ID"라 눌러도 수익·정지 위험이 없습니다.
 /// 출시 직전에만 본인 AdMob 광고 단위 ID로 교체하세요.
 ///
@@ -34,16 +37,26 @@ public class AdMobRewardedADService : RewardedADService
              "여기 연결한 FakeRewardedADService가 대신 동작합니다.")]
     public RewardedADService nonMobileFallback;
 
+    [Header("유럽 광고 동의 (GDPR / UMP) 테스트")]
+    [Tooltip("체크하면 내 기기를 유럽 유저처럼 취급해서 동의 창을 띄웁니다. 테스트할 때만 켜고, 출시 빌드에서는 반드시 끄세요.")]
+    public bool consentForceEEAForTest = false;
+
+    [Tooltip("동의 창 테스트용 기기 ID. 앱 실행 후 Logcat / Xcode 콘솔에서 'ConsentDebugSettings' 또는 " +
+             "'addTestDeviceHashedId' 문구 옆에 나오는 값을 넣으세요.")]
+    public string[] consentTestDeviceHashedIds;
+
     [Header("로드 실패 시 재시도 간격(초)")]
     public float retryDelay = 10f;
 
     // SDK 초기화는 앱 실행 중 한 번이면 충분합니다. Restart로 씬이 다시 로드되어도
     // 이 값은 static이라 유지되므로 중복 초기화를 하지 않습니다.
     private static bool sdkInitialized = false;
+    private static bool sdkInitializing = false;
 
-    private RewardedAd rewardedAd;
-    private bool isLoading;
-    private bool showing;
+    // [1.1] 씬이 다시 로드되어도 유지되도록 static으로 보관 (다시시작 때 광고를 버리고 새로 요청하지 않음)
+    private static RewardedAd rewardedAd;
+    private static bool isLoading;
+    private static bool showing;
 
     private bool UseFallback
     {
@@ -88,6 +101,9 @@ public class AdMobRewardedADService : RewardedADService
             return;
         }
 
+        if (sdkInitializing) return; // 이미 동의 확인 / 초기화 진행 중 (끝나면 광고를 받아둠)
+        sdkInitializing = true;
+
         // 광고 이벤트를 유니티 메인 스레드에서 받도록 설정.
         // 이게 없으면 콜백 안에서 UI/하트를 건드릴 때 크래시가 날 수 있습니다.
         MobileAds.RaiseAdEventsOnUnityMainThread = true;
@@ -100,19 +116,35 @@ public class AdMobRewardedADService : RewardedADService
             });
         }
 
-        MobileAds.Initialize(status =>
+        // [1.1] 유럽 광고 동의(GDPR)를 먼저 확인한 뒤 AdMob을 시작합니다.
+        //       한국·미국 등은 창 없이 바로 넘어갑니다.
+        ConsentManager.Gather(consentForceEEAForTest, consentTestDeviceHashedIds, () =>
         {
-            sdkInitialized = true;
-            Debug.Log("[AdMob] SDK 초기화 완료");
-            if (this != null) LoadAd();   // 그 사이 씬이 바뀌어 파괴됐으면 건너뜀
+            if (!ConsentManager.CanRequestAds)
+            {
+                // 동의 정보를 아직 못 받음 (첫 실행인데 인터넷이 없는 경우 등). 다음 씬 시작 때 다시 시도.
+                sdkInitializing = false;
+                Debug.LogWarning("[AdMob] 아직 광고를 요청할 수 없는 상태입니다. (동의 정보 없음)");
+                return;
+            }
+
+            MobileAds.Initialize(status =>
+            {
+                sdkInitialized = true;
+                sdkInitializing = false;
+                Debug.Log("[AdMob] SDK 초기화 완료");
+                LoadAd(); // 받아둔 광고는 static이라 씬이 바뀌었어도 다음 씬에서 그대로 씁니다
+            });
         });
     }
+
+    [ContextMenu("TEST: 광고 동의 초기화 (다음 실행 때 동의 창 다시 보기)")]
+    private void TestResetConsent() => ConsentManager.ResetForTest();
 
     void OnDestroy()
     {
         CancelInvoke();
-        rewardedAd?.Destroy();
-        rewardedAd = null;
+        // [1.1] 받아둔 광고는 static이라 파괴하지 않고 다음 씬에서 그대로 씁니다.
     }
 
     // ───────────── 광고 로드 ─────────────
@@ -120,6 +152,9 @@ public class AdMobRewardedADService : RewardedADService
     private void LoadAd()
     {
         if (isLoading) return;
+
+        // [1.1] 이미 보여줄 수 있는 광고가 있으면 새로 요청하지 않음 (다시시작 후 재사용)
+        if (rewardedAd != null && rewardedAd.CanShowAd() && !showing) return;
 
         rewardedAd?.Destroy();
         rewardedAd = null;
@@ -129,13 +164,12 @@ public class AdMobRewardedADService : RewardedADService
 
         RewardedAd.Load(AdUnitId, new AdRequest(), (RewardedAd ad, LoadAdError error) =>
         {
-            if (this == null) { ad?.Destroy(); return; }
             isLoading = false;
 
             if (error != null || ad == null)
             {
                 Debug.LogWarning($"[AdMob] 광고 로드 실패: {error}\n{retryDelay}초 후 다시 시도합니다.");
-                Invoke(nameof(LoadAd), retryDelay);
+                if (this != null) Invoke(nameof(LoadAd), retryDelay); // 씬이 바뀌었으면 다음 씬의 Start에서 다시 요청
                 return;
             }
 

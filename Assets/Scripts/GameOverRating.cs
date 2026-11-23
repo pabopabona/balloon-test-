@@ -25,6 +25,9 @@ public class GameOverRating : MonoBehaviour
 
         public string message;
 
+        [Tooltip("영어 문구 (비워두면 한국어 문구가 그대로 나옵니다)")]
+        public string messageEn;
+
         [Tooltip("문구 색")]
         public Color color = Color.white;
 
@@ -65,11 +68,14 @@ public class GameOverRating : MonoBehaviour
 
     [Tooltip("최고 등급일 때 Next Goal Text에 보여줄 문구 (비워두면 숨김). 그 외 등급에서는 Next Goal Text가 숨겨집니다.")]
     public string topTierGoalMessage = "최고 등급이에요! 기록을 더 늘려보세요";
+    public string topTierGoalMessageEn = "Top rank! Push your record even higher";
 
     [Tooltip("{0} = 최고 기록 레벨")]
     public string bestFormat = "최고 기록 Lv. {0}";
+    public string bestFormatEn = "Best Lv. {0}";
 
     public string newBestMessage = "새 기록!";
+    public string newBestMessageEn = "New Record!";
 
     [Header("기록 갱신 축하 (폭죽)")]
     [Tooltip("최고 기록을 갱신했을 때 띄울 이펙트(파티클) 프리팹. 재생 후 스스로 사라지게 " +
@@ -102,10 +108,10 @@ public class GameOverRating : MonoBehaviour
     [Header("등급 (레벨이 낮은 순서대로)")]
     public List<RatingTier> tiers = new List<RatingTier>
     {
-        new RatingTier { maxLevel = 15,  message = "좀 더 노력해봐",          color = new Color(0.85f, 0.85f, 0.85f) },
-        new RatingTier { maxLevel = 20,  message = "좀 하는데",              color = new Color(0.55f, 0.85f, 1.00f) },
-        new RatingTier { maxLevel = 25,  message = "훌륭해요!!!",            color = new Color(1.00f, 0.85f, 0.25f) },
-        new RatingTier { maxLevel = 999, message = "믿을 수 없는 수준이네요!!", color = new Color(1.00f, 0.45f, 0.75f) },
+        new RatingTier { maxLevel = 15,  message = "좀 더 노력해봐",          messageEn = "Keep trying!",   color = new Color(0.85f, 0.85f, 0.85f) },
+        new RatingTier { maxLevel = 20,  message = "좀 하는데",              messageEn = "Not bad!",       color = new Color(0.55f, 0.85f, 1.00f) },
+        new RatingTier { maxLevel = 25,  message = "훌륭해요!!!",            messageEn = "Excellent!!!",   color = new Color(1.00f, 0.85f, 0.25f) },
+        new RatingTier { maxLevel = 999, message = "믿을 수 없는 수준이네요!!", messageEn = "Unbelievable!!", color = new Color(1.00f, 0.45f, 0.75f) },
     };
 
     private const string BestLevelKey = "best_level";
@@ -163,7 +169,7 @@ public class GameOverRating : MonoBehaviour
 
         if (ratingText != null)
         {
-            ratingText.text = tier.message;
+            ratingText.text = Loc.Pick(tier.message, tier.messageEn);
             ratingText.color = tier.color;
         }
 
@@ -175,14 +181,14 @@ public class GameOverRating : MonoBehaviour
 
         bool isTopTier = tierIndex >= tiers.Count - 1;
         if (nextGoalText != null)
-            nextGoalText.text = topTierGoalMessage;
+            nextGoalText.text = Loc.Pick(topTierGoalMessage, topTierGoalMessageEn);
 
         if (bestText != null)
         {
             // 첫 판(이전 기록 없음)에는 "새 기록!" 대신 최고 기록만 보여줌
             bestText.text = (isNewBest && previousBest > 0)
-                ? newBestMessage
-                : string.Format(bestFormat, Mathf.Max(level, previousBest));
+                ? Loc.Pick(newBestMessage, newBestMessageEn)
+                : string.Format(Loc.Pick(bestFormat, bestFormatEn), Mathf.Max(level, previousBest));
         }
 
         SetVisible(true);
@@ -258,4 +264,28 @@ public class GameOverRating : MonoBehaviour
     [ContextMenu("TEST: Lv.23로 표시")] private void Test23() => Show(23);
     [ContextMenu("TEST: Lv.31로 표시")] private void Test31() => Show(31);
     [ContextMenu("TEST: 최고 기록 지우기")] private void TestResetBest() => PlayerPrefs.DeleteKey(BestLevelKey);
+
+    // ───────────── 영어 기본 문구 채우기 (1.1) ─────────────
+
+    /// <summary>
+    /// 이미 씬에 붙어 있는 컴포넌트는 새로 추가된 영어 칸이 비어 있으므로,
+    /// 인스펙터 ⋮ 메뉴에서 한 번 실행해 기본 영어 문구를 채웁니다. (등급은 위에서부터 순서대로)
+    /// 이미 영어가 적힌 칸은 덮어쓰지 않습니다.
+    /// </summary>
+    [ContextMenu("영어 기본 문구 채우기")]
+    private void FillDefaultEnglish()
+    {
+        string[] tierEn = { "Keep trying!", "Not bad!", "Excellent!!!", "Unbelievable!!" };
+        for (int i = 0; i < tiers.Count && i < tierEn.Length; i++)
+            if (string.IsNullOrEmpty(tiers[i].messageEn)) tiers[i].messageEn = tierEn[i];
+
+        if (string.IsNullOrEmpty(topTierGoalMessageEn)) topTierGoalMessageEn = "Top rank! Push your record even higher";
+        if (string.IsNullOrEmpty(bestFormatEn)) bestFormatEn = "Best Lv. {0}";
+        if (string.IsNullOrEmpty(newBestMessageEn)) newBestMessageEn = "New Record!";
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        Debug.Log("[GameOverRating] 영어 기본 문구를 채웠습니다. 인스펙터에서 확인 후 씬을 저장하세요.");
+    }
 }

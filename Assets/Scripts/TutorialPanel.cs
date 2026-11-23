@@ -22,6 +22,13 @@ public class TutorialPanel : MonoBehaviour
         public string title;
         public Sprite image;
         [TextArea(2, 5)] public string description;
+
+        [Header("English")]
+        public string titleEn;
+        [TextArea(2, 5)] public string descriptionEn;
+
+        [Tooltip("영어일 때 다른 이미지를 쓰려면 넣으세요 (비워두면 위 이미지 그대로)")]
+        public Sprite imageEn;
     }
 
     [Header("열기 버튼 (화면 오른쪽 위 동그란 버튼)")]
@@ -116,10 +123,22 @@ public class TutorialPanel : MonoBehaviour
             Time.timeScale = 0f;
     }
 
+    void OnEnable()
+    {
+        Loc.OnLanguageChanged += RefreshCurrentPage;
+    }
+
     void OnDisable()
     {
+        Loc.OnLanguageChanged -= RefreshCurrentPage;
+
         // 창이 열린 채로 씬이 바뀌면 게임이 멈춘 상태로 남지 않도록 되돌립니다.
         if (isOpen) Close();
+    }
+
+    private void RefreshCurrentPage()
+    {
+        if (isOpen && pages != null && currentIndex < pages.Count) ShowPage(currentIndex);
     }
 
     // ───────────── 열기 / 닫기 ─────────────
@@ -185,13 +204,14 @@ public class TutorialPanel : MonoBehaviour
     {
         TutorialPage page = pages[index];
 
-        if (titleText != null) titleText.text = page.title;
-        if (descriptionText != null) descriptionText.text = page.description;
+        if (titleText != null) titleText.text = Loc.Pick(page.title, page.titleEn);
+        if (descriptionText != null) descriptionText.text = Loc.Pick(page.description, page.descriptionEn);
 
         if (pageImage != null)
         {
-            pageImage.sprite = page.image;
-            pageImage.enabled = page.image != null; // 이미지가 없으면 빈 흰 사각형 대신 숨김
+            Sprite sprite = (Loc.Current == GameLanguage.English && page.imageEn != null) ? page.imageEn : page.image;
+            pageImage.sprite = sprite;
+            pageImage.enabled = sprite != null; // 이미지가 없으면 빈 흰 사각형 대신 숨김
             pageImage.preserveAspect = true;
         }
 
@@ -201,6 +221,37 @@ public class TutorialPanel : MonoBehaviour
         // 첫 장에서는 이전 버튼, 마지막 장에서는 다음 버튼을 비활성화
         if (prevButton != null) prevButton.interactable = index > 0;
         if (nextButton != null) nextButton.interactable = index < pages.Count - 1;
+    }
+
+    /// <summary>
+    /// (1.1) 이미 씬에 있는 튜토리얼은 영어 칸이 비어 있으므로, 인스펙터 ⋮ 메뉴에서 한 번 실행해
+    /// 기본 영어 문구를 채웁니다. 페이지 순서(1~8장)대로 채우며, 이미 적힌 칸은 덮어쓰지 않습니다.
+    /// </summary>
+    [ContextMenu("영어 기본 문구 채우기")]
+    private void FillDefaultEnglish()
+    {
+        string[][] en =
+        {
+            new[] { "Shoot Balloons", "Move the balloon cart left and right to shoot balloons.\nAfter each shot, you can see the next balloon." },
+            new[] { "Pop Balloons", "Connect 3 balloons of the same color and shape to pop them." },
+            new[] { "Rainbow Balloon", "Rainbow balloons appear from a certain level.\nPop 3 together to burst the balloons right next to them and fill the Reset Timer gauge." },
+            new[] { "Reset Timer Skill", "When the Reset Timer gauge is full, it activates automatically and slows down the shot timer.\nEach time it activates, one more match is needed to fill it again." },
+            new[] { "Lightning Balloon", "Lightning balloons appear from a certain level.\nPop 3 together to clear every balloon in their rows and fill the All Clear gauge." },
+            new[] { "All Clear Skill", "When the All Clear gauge is full, it activates automatically and pops every balloon except the top row.\nEach time it activates, one more match is needed to fill it again." },
+            new[] { "Brick Balloon", "Brick balloons appear from a certain level and turn into bricks as soon as they attach.\nBricks don't disappear even when 3 are connected." },
+            new[] { "Breaking Bricks", "Bricks disappear when a rainbow balloon pops next to them or a lightning balloon pops." }
+        };
+
+        for (int i = 0; i < pages.Count && i < en.Length; i++)
+        {
+            if (string.IsNullOrEmpty(pages[i].titleEn)) pages[i].titleEn = en[i][0];
+            if (string.IsNullOrEmpty(pages[i].descriptionEn)) pages[i].descriptionEn = en[i][1];
+        }
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+        Debug.Log("[TutorialPanel] 영어 기본 문구를 채웠습니다. 페이지 순서가 맞는지 확인 후 씬을 저장하세요.");
     }
 
     [ContextMenu("TEST: 처음 실행 상태로 되돌리기 (자동 열림 다시 보기)")]

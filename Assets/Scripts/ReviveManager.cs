@@ -63,6 +63,9 @@ public class ReviveManager : MonoBehaviour
     [Tooltip("남은 시간 표시 형식. {0} = 남은 초")]
     public string countdownFormat = "{0}";
 
+    [Tooltip("영어일 때 남은 시간 표시 형식. {0} = 남은 초 (예: \"{0}s\")")]
+    public string countdownFormatEn = "{0}";
+
     [Header("이어갈 때 화면 정리 (비워두면 전기 스킬 설정을 그대로 사용)")]
     [Tooltip("맨 위에서 몇 줄을 남길지. -1이면 SkillManager의 Keep Top Rows와 같은 값")]
     public int keepTopRows = -1;
@@ -146,7 +149,7 @@ public class ReviveManager : MonoBehaviour
         float r = Mathf.Max(0f, remaining);
 
         if (countdownText != null)
-            countdownText.text = string.Format(countdownFormat, Mathf.CeilToInt(r));
+            countdownText.text = string.Format(Loc.Pick(countdownFormat, countdownFormatEn), Mathf.CeilToInt(r));
 
         if (countdownFill != null)
             countdownFill.fillAmount = countdownSeconds > 0f ? r / countdownSeconds : 0f;

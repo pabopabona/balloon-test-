@@ -42,6 +42,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("화면 프레임 (1.1)")]
+    [Tooltip("목표 프레임. 모바일 기본값은 30이라 60으로 올리면 풍선과 발사대 움직임이 부드러워집니다.")]
+    public int targetFrameRate = 60;
+
     [Header("참조")]
     public LauncherController launcher;
     public HexGridManager gridManager;
@@ -135,6 +139,10 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // 모바일 기본 30fps → 60fps (VSync가 켜져 있으면 targetFrameRate가 무시되므로 끔)
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = targetFrameRate;
     }
 
     void OnEnable()
