@@ -5133,7 +5133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AdMobRewardedADService
   androidAdUnitId: ca-app-pub-2202292692096450/8638275901
-  iosAdUnitId: ca-app-pub-3940256099942544/1712485313
+  iosAdUnitId: ca-app-pub-2202292692096450/8949133646
   testDeviceIds:
   - 4f105385-82a4-4623-8da3-05c2880a3a80
   nonMobileFallback: {fileID: 683787833}
